@@ -10,14 +10,16 @@ export function createLoggedHandler(logger: log.LogFunctions) {
     ipcMain.handle(
       channel,
       async (event: IpcMainInvokeEvent, ...args: any[]) => {
-        logger.log(`IPC: ${channel} called with args: ${JSON.stringify(args)}`);
+        // Reduce noise: use debug level for routine call/return logs
+        logger.debug(`IPC: ${channel} called with args: ${JSON.stringify(args)}`);
         try {
           const result = await fn(event, ...args);
-          logger.log(
+          logger.debug(
             `IPC: ${channel} returned: ${JSON.stringify(result)?.slice(0, 100)}...`,
           );
           return result;
         } catch (error) {
+          // Keep errors visible
           logger.error(
             `Error in ${fn.name}: args: ${JSON.stringify(args)}`,
             error,

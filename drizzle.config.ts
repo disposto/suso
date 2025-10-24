@@ -1,14 +1,19 @@
-import type { Config } from "drizzle-kit";
-import path from "path";
+import { defineConfig } from "drizzle-kit";
 import { getUserDataPath } from "./src/paths/paths";
+import path from "node:path";
+import * as dotenv from "dotenv";
 
-const dbPath = path.join(getUserDataPath(), "sqlite.db");
+// Load environment variables
+dotenv.config();
 
-export default {
+const databaseUrl = process.env.DATABASE_URL;
+
+// Use PostgreSQL if DATABASE_URL is set, otherwise fallback to SQLite
+export default defineConfig({
   schema: "./src/db/schema.ts",
-  out: "./drizzle",
-  dialect: "sqlite",
-  dbCredentials: {
-    url: dbPath,
-  },
-} satisfies Config;
+  out: databaseUrl && databaseUrl.startsWith('postgresql://') ? "./drizzle-postgres" : "./drizzle",
+  dialect: databaseUrl && databaseUrl.startsWith('postgresql://') ? "postgresql" : "sqlite",
+  dbCredentials: databaseUrl && databaseUrl.startsWith('postgresql://') 
+    ? { url: databaseUrl }
+    : { url: path.join(getUserDataPath(), "sqlite.db") },
+});

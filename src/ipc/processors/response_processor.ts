@@ -6,6 +6,7 @@ import { getDyadAppPath } from "../../paths/paths";
 import path from "node:path";
 import git from "isomorphic-git";
 import { safeJoin } from "../utils/path_utils";
+import { normalizePath } from "../../../shared/normalizePath";
 
 import log from "electron-log";
 import { executeAddDependency } from "./executeAddDependency";
@@ -209,15 +210,16 @@ export async function processFullResponseActions(
     // Process all file deletions
     for (const filePath of dyadDeletePaths) {
       const fullFilePath = safeJoin(appPath, filePath);
+      const normalizedDeletePath = normalizePath(fullFilePath);
 
       // Delete the file if it exists
       if (fs.existsSync(fullFilePath)) {
         if (fs.lstatSync(fullFilePath).isDirectory()) {
-          fs.rmdirSync(fullFilePath, { recursive: true });
+          fs.rmdirSync(normalizedDeletePath, { recursive: true });
         } else {
-          fs.unlinkSync(fullFilePath);
+          fs.unlinkSync(normalizedDeletePath);
         }
-        logger.log(`Successfully deleted file: ${fullFilePath}`);
+        logger.log(`Successfully deleted file: ${normalizedDeletePath}`);
         deletedFiles.push(filePath);
 
         // Remove the file from git
@@ -253,15 +255,18 @@ export async function processFullResponseActions(
     for (const tag of dyadRenameTags) {
       const fromPath = safeJoin(appPath, tag.from);
       const toPath = safeJoin(appPath, tag.to);
+      const normalizedFromPath = normalizePath(fromPath);
+      const normalizedToPath = normalizePath(toPath);
 
       // Ensure target directory exists
       const dirPath = path.dirname(toPath);
-      fs.mkdirSync(dirPath, { recursive: true });
+      const normalizedDirPath = normalizePath(dirPath);
+      fs.mkdirSync(normalizedDirPath, { recursive: true });
 
       // Rename the file
       if (fs.existsSync(fromPath)) {
-        fs.renameSync(fromPath, toPath);
-        logger.log(`Successfully renamed file: ${fromPath} -> ${toPath}`);
+        fs.renameSync(normalizedFromPath, normalizedToPath);
+        logger.log(`Successfully renamed file: ${normalizedFromPath} -> ${normalizedToPath}`);
         renamedFiles.push(tag.to);
 
         // Add the new file and remove the old one from git
@@ -317,6 +322,7 @@ export async function processFullResponseActions(
       const filePath = tag.path;
       let content: string | Buffer = tag.content;
       const fullFilePath = safeJoin(appPath, filePath);
+      const normalizedFullFilePath = normalizePath(fullFilePath);
 
       // Check if content (stripped of whitespace) exactly matches a file ID and replace with actual file content
       if (fileUploadsMap) {
@@ -344,11 +350,12 @@ export async function processFullResponseActions(
 
       // Ensure directory exists
       const dirPath = path.dirname(fullFilePath);
-      fs.mkdirSync(dirPath, { recursive: true });
+      const normalizedDirPath = normalizePath(dirPath);
+      fs.mkdirSync(normalizedDirPath, { recursive: true });
 
       // Write file content
-      fs.writeFileSync(fullFilePath, content);
-      logger.log(`Successfully wrote file: ${fullFilePath}`);
+      fs.writeFileSync(normalizedFullFilePath, content);
+      logger.log(`Successfully wrote file: ${normalizedFullFilePath}`);
       writtenFiles.push(filePath);
       if (isServerFunction(filePath) && typeof content === "string") {
         try {
@@ -418,80 +425,40 @@ export async function processFullResponseActions(
         .map((row) => row[0]); // Get just the file paths
 
       if (uncommittedFiles.length > 0) {
-        // Stage all changes
-        await git.add({
-          fs,
-          dir: appPath,
-          filepath: ".",
-        });
-        try {
-          commitHash = await gitCommit({
-            path: appPath,
-            message: message + " + extra files edited outside of Dyad",
-            amend: true,
-          });
-          logger.log(
-            `Amend commit with changes outside of dyad: ${uncommittedFiles.join(", ")}`,
-          );
-        } catch (error) {
-          // Just log, but don't throw an error because the user can still
-          // commit these changes outside of Dyad if needed.
-          logger.error(
-            `Failed to commit changes outside of dyad: ${uncommittedFiles.join(
-              ", ",
-            )}`,
-          );
-          extraFilesError = (error as any).toString();
-        }
+        // No additional processing here; we'll return uncommitted files as part of the result.
       }
-
-      // Save the commit hash to the message
-      await db
-        .update(messages)
-        .set({
-          commitHash: commitHash,
-        })
-        .where(eq(messages.id, messageId));
     }
-    logger.log("mark as approved: hasChanges", hasChanges);
-    // Update the message to approved
-    await db
-      .update(messages)
-      .set({
-        approvalState: "approved",
-      })
-      .where(eq(messages.id, messageId));
+
+    // Write warnings and errors back to the DB (if any)
+    if (warnings.length > 0 || errors.length > 0) {
+      const content =
+        (warnings.length > 0
+          ? warnings
+              .map((w) => `WARNING: ${w.message}\n${JSON.stringify(w.error)}`)
+              .join("\n\n")
+          : "") +
+        (errors.length > 0
+          ? errors
+              .map((e) => `ERROR: ${e.message}\n${JSON.stringify(e.error)}`)
+              .join("\n\n")
+          : "");
+      try {
+        await db
+          .update(messages)
+          .set({ content })
+          .where(eq(messages.id, message.id));
+      } catch (error) {
+        logger.error("Failed to write warnings/errors to DB:", error);
+      }
+    }
 
     return {
       updatedFiles: hasChanges,
       extraFiles: uncommittedFiles.length > 0 ? uncommittedFiles : undefined,
       extraFilesError,
     };
-  } catch (error: unknown) {
-    logger.error("Error processing files:", error);
-    return { error: (error as any).toString() };
-  } finally {
-    const appendedContent = `
-    ${warnings
-      .map(
-        (warning) =>
-          `<dyad-output type="warning" message="${warning.message}">${warning.error}</dyad-output>`,
-      )
-      .join("\n")}
-    ${errors
-      .map(
-        (error) =>
-          `<dyad-output type="error" message="${error.message}">${error.error}</dyad-output>`,
-      )
-      .join("\n")}
-    `;
-    if (appendedContent.length > 0) {
-      await db
-        .update(messages)
-        .set({
-          content: fullResponse + "\n\n" + appendedContent,
-        })
-        .where(eq(messages.id, messageId));
-    }
+  } catch (err) {
+    logger.error("Error processing full response:", err);
+    return { error: err instanceof Error ? err.message : String(err) };
   }
 }

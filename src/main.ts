@@ -32,6 +32,11 @@ const logger = log.scope("main");
 // Load environment variables from .env file
 dotenv.config();
 
+// Configure log verbosity: quiet by default, enable debug via DEBUG_IPC=1
+const debugIpc = process.env.DEBUG_IPC === "1" || process.env.DEBUG_IPC === "true";
+log.transports.console.level = debugIpc ? "debug" : "warn";
+log.transports.file.level = debugIpc ? "debug" : "info";
+
 // Register IPC handlers before app is ready
 registerIpcHandlers();
 
@@ -163,8 +168,11 @@ const createWindow = () => {
       path.join(__dirname, "../renderer/main_window/index.html"),
     );
   }
-  if (process.env.NODE_ENV === "development") {
-    // Open the DevTools.
+  // Stop opening DevTools automatically; only open if explicitly enabled via env var
+  const shouldOpenDevTools =
+    process.env.OPEN_DEVTOOLS === "1" || process.env.OPEN_DEVTOOLS === "true";
+  if (shouldOpenDevTools) {
+    // Open the DevTools on demand
     mainWindow.webContents.openDevTools();
   }
 
