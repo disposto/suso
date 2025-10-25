@@ -104,9 +104,9 @@ export function ProModeSelector() {
           <div className="flex flex-col gap-5">
             <SelectorRow
               id="pro-enabled"
-              label="Enable Dyad Pro"
-              description="Use Dyad Pro AI credits"
-              tooltip="Uses Dyad Pro AI credits for the main AI model and Pro modes."
+              label="Enable Suso Pro"
+              description="Use Suso Pro AI credits"
+              tooltip="Uses Suso Pro AI credits for the main AI model and Pro modes."
               isTogglable={hasProKey}
               settingEnabled={Boolean(settings?.enableDyadPro)}
               toggle={toggleProEnabled}

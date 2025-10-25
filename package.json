@@ -1,6 +1,6 @@
 {
-  "name": "dyad",
-  "productName": "dyad",
+  "name": "suso",
+  "productName": "suso",
   "version": "0.25.0-beta.1",
   "description": "Free, local, open-source AI app builder",
   "main": ".vite/build/main.js",

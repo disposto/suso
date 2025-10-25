@@ -1,4 +1,20 @@
-export const INSPIRATION_PROMPTS = [
+// inspiration_prompts.tsx
+import React from "react";
+
+/**
+ * INSPIRATION_PROMPTS_SWISS
+ *
+ * Cada prompt contém metadados que guiam a geração no estilo "Swiss / Modern Global":
+ * - label: rótulo curto
+ * - icon: JSX SVG (mantive os originais)
+ * - description: instrução curta e direta para a IA (estilo, tom, espaçamento, microinterações)
+ * - styleTags: tags que devem sempre aparecer (usadas como constraints)
+ * - layoutHints: dicas de layout (grid, margem, tipografia)
+ * - density: quão "respirado" é o layout (low/medium/high) — Swiss tende a LOW (muito espaço)
+ * - examples: referências de marcas/designs que definem o tone (Apple, Vercel, Notion, Stripe, Nike, Stellar)
+ */
+
+export const INSPIRATION_PROMPTS_SWISS = [
   {
     icon: (
       <svg
@@ -22,6 +38,13 @@ export const INSPIRATION_PROMPTS = [
       </svg>
     ),
     label: "TODO list app",
+    description:
+      "Generate a TODO list app UI in Swiss design: strong typographic hierarchy, left-aligned grid, lots of white space, subtle microinteractions (hover, focus), minimal color accents. Clean functional components, accessible forms.",
+    styleTags: ["swiss", "minimal", "typography-first", "space", "microinteractions"],
+    layoutHints:
+      "Left column list, large negative space, 8–12pt scale for type, 12-column grid but large gutters, CTA accent color used sparingly.",
+    density: "low",
+    examples: ["Apple", "Notion", "Vercel"],
   },
   {
     icon: (
@@ -40,6 +63,13 @@ export const INSPIRATION_PROMPTS = [
       </svg>
     ),
     label: "Landing Page",
+    description:
+      "Create a hero-first landing page with Swiss aesthetics: large left-aligned headline, strong baseline grid, restrained color palette (black/gray + one accent), generous margins, animated scroll reveal for sections and subtle button micro-animations.",
+    styleTags: ["swiss", "hero", "left-aligned", "bold-typography", "animated-scroll"],
+    layoutHints:
+      "Hero uses large type (80–120px desktop), 2-column content on desktop, single column mobile, wide gutters, slow ease-in scroll reveals.",
+    density: "low",
+    examples: ["Vercel", "Stripe", "Nike"],
   },
   {
     icon: (
@@ -58,6 +88,13 @@ export const INSPIRATION_PROMPTS = [
       </svg>
     ),
     label: "Sign Up Form",
+    description:
+      "Design a sign-up form in Swiss style: minimal fields, large labels, clear visual focus states, use of system fonts or neutral sans, clear spacing between fields, microcopy and inline validation with gentle animations.",
+    styleTags: ["swiss", "form", "accessible", "minimal-fields", "focus-states"],
+    layoutHints:
+      "Vertical form with roomy spacing, labels above fields, 1.25–1.5x line-height, animated focus ring, primary CTA full-width on mobile, subtle success micro-interaction.",
+    density: "low",
+    examples: ["Notion", "Stripe"],
   },
   {
     icon: (
@@ -82,6 +119,13 @@ export const INSPIRATION_PROMPTS = [
       </svg>
     ),
     label: "Mood Journal & Tracker",
+    description:
+      "Build a calm, grid-based tracker UI with Swiss styling: neutral palette, clear status indicators, roomy timeline cards, simple onboarding microinteractions and animated progress transitions.",
+    styleTags: ["swiss", "calm", "grid-cards", "animated-transitions", "neutral-palette"],
+    layoutHints:
+      "Card grid with large gaps, subtle shadows or no shadows, animated progress bars with eased transitions, consistent 16/24 spacing rhythm.",
+    density: "low",
+    examples: ["Apple", "Stellar"],
   },
   {
     icon: (
@@ -100,6 +144,13 @@ export const INSPIRATION_PROMPTS = [
       </svg>
     ),
     label: "Interactive Story Game",
+    description:
+      "Design a minimal interactive-story layout: left rail for choices, large readable text body, strong negative space, animated reveal of new chapters with smooth scroll and micro-interactions for choices.",
+    styleTags: ["swiss", "reading-first", "large-type", "choice-microinteractions", "animated-reveal"],
+    layoutHints:
+      "Single-column reading area with left-aligned progress indicator, large margins, subtle typography animations on reveal.",
+    density: "low",
+    examples: ["Notion", "Nike"],
   },
   {
     icon: (
@@ -118,6 +169,13 @@ export const INSPIRATION_PROMPTS = [
       </svg>
     ),
     label: "Recipe Finder & Meal Planner",
+    description:
+      "Create a clean card-driven recipe finder: large imagery cropped in strict rectangles, clear typography, filter controls as subtle toggles, animated card hover and inexpensive transitions.",
+    styleTags: ["swiss", "card-grid", "image-cropping", "filters", "subtle-animations"],
+    layoutHints:
+      "Centered grid with strong baseline, images aligned to grid, 24–32px gutters, lightweight hover scale on cards.",
+    density: "low",
+    examples: ["Vercel", "Apple"],
   },
   {
     icon: (
@@ -136,6 +194,13 @@ export const INSPIRATION_PROMPTS = [
       </svg>
     ),
     label: "Personal Finance Dashboard",
+    description:
+      "Design a finance dashboard focusing on clarity: strict grid, numeric typography, concise charts, minimal color usage to indicate states, smooth transitions when numbers update.",
+    styleTags: ["swiss", "data-clarity", "numeric-typography", "smooth-updates", "strict-grid"],
+    layoutHints:
+      "Dashboard uses cards with clear headings, consistent gutter rhythm, animated number changes with easing, low visual noise.",
+    density: "low",
+    examples: ["Stellar", "Stripe"],
   },
   {
     icon: (
@@ -160,6 +225,13 @@ export const INSPIRATION_PROMPTS = [
       </svg>
     ),
     label: "Travel Memory Map",
+    description:
+      "Create a travel memory map UI with Swiss minimalism: map as background with clear pins, oversized typography for titles, list of memories in a left column, smooth scroll and pinned header microinteractions.",
+    styleTags: ["swiss", "map", "pins", "left-column", "pinned-header"],
+    layoutHints:
+      "Split layout: narrow left column list, wide map area; keep heavy whitespace around list items; animated pin reveal on scroll.",
+    density: "low",
+    examples: ["Apple", "Vercel"],
   },
   {
     icon: (
@@ -178,6 +250,13 @@ export const INSPIRATION_PROMPTS = [
       </svg>
     ),
     label: "AI Writing Assistant",
+    description:
+      "Design an editor-first interface with Swiss clarity: roomy text area, strong typographic rhythm, unobtrusive toolbars, contextual microinteractions and smooth autosave feedback.",
+    styleTags: ["swiss", "editor", "typography", "autosave", "contextual-toolbar"],
+    layoutHints:
+      "Single-column editor, left margin for line numbers or progress, minimal toolbar icons, animated save indicator in top bar.",
+    density: "low",
+    examples: ["Notion", "Vercel"],
   },
   {
     icon: (
@@ -196,6 +275,13 @@ export const INSPIRATION_PROMPTS = [
       </svg>
     ),
     label: "Habit Streak Tracker",
+    description:
+      "Design a streak tracker with Swiss cleanness: calendar grid with large spacing, clear success/fail states using subtle accent, animated streak increments.",
+    styleTags: ["swiss", "calendar-grid", "streak", "animated-increment", "subtle-accent"],
+    layoutHints:
+      "Grid with consistent cell size, 24px gutters, minimal legend, microinteractions on hover and check.",
+    density: "low",
+    examples: ["Apple", "Notion"],
   },
   {
     icon: (
@@ -214,6 +300,13 @@ export const INSPIRATION_PROMPTS = [
       </svg>
     ),
     label: "Newsletter Creator",
+    description:
+      "Create a minimal editor/preview for newsletters: clear column width for readable line length, typographic scale tuned for reading, publish microinteractions and preview toggles.",
+    styleTags: ["swiss", "editor-preview", "readable-width", "publish-microinteractions"],
+    layoutHints:
+      "Fixed-width preview column centered, large margins, animated publish flow with confirmation microcopy.",
+    density: "low",
+    examples: ["Stripe", "Notion"],
   },
   {
     icon: (
@@ -232,6 +325,13 @@ export const INSPIRATION_PROMPTS = [
       </svg>
     ),
     label: "Music Discovery App",
+    description:
+      "Design a discovery UI with Swiss minimalism: large cover art cropped to grid, left-aligned lists, subtle animated transitions when switching playlists or tracks.",
+    styleTags: ["swiss", "discovery", "cover-grid", "animated-transitions"],
+    layoutHints:
+      "Card or list layout with strong baseline, oversized headings for featured items, micro-interactions for play controls.",
+    density: "low",
+    examples: ["Nike", "Apple"],
   },
   {
     icon: (
@@ -250,6 +350,13 @@ export const INSPIRATION_PROMPTS = [
       </svg>
     ),
     label: "3D Portfolio Viewer",
+    description:
+      "Create a minimal 3D portfolio shell: large whitespace, subtle controls, left or top-aligned captioning, graceful loading skeletons and animated transitions between models.",
+    styleTags: ["swiss", "3d", "skeleton", "large-whitespace", "subtle-controls"],
+    layoutHints:
+      "Canvas centered or right, left column for metadata, full-bleed hero optionally, minimal UI chrome.",
+    density: "low",
+    examples: ["Stellar", "Vercel"],
   },
   {
     icon: (
@@ -268,6 +375,13 @@ export const INSPIRATION_PROMPTS = [
       </svg>
     ),
     label: "AI Image Generator",
+    description:
+      "Design a clean generator interface: large canvas preview, minimal controls, clear prompt area, progress micro-animations and result gallery in a strict grid.",
+    styleTags: ["swiss", "canvas-first", "strict-grid", "preview", "progress-animations"],
+    layoutHints:
+      "Preview pane large and centered/right, commands on left, generated result grid with consistent ratios.",
+    density: "low",
+    examples: ["Vercel", "Notion"],
   },
   {
     icon: (
@@ -286,6 +400,13 @@ export const INSPIRATION_PROMPTS = [
       </svg>
     ),
     label: "Pomodoro Focus Timer",
+    description:
+      "Design a calm Pomodoro UI with Swiss clarity: large central timer, simple control buttons, subtle animations on session change and progress rings.",
+    styleTags: ["swiss", "timer", "focus", "progress-ring", "calm"],
+    layoutHints:
+      "Centered hero timer, minimal chrome, subtle animated ring and microcopy for state changes.",
+    density: "low",
+    examples: ["Apple"],
   },
   {
     icon: (
@@ -304,5 +425,15 @@ export const INSPIRATION_PROMPTS = [
       </svg>
     ),
     label: "Virtual Avatar Builder",
+    description:
+      "Design an avatar builder with Swiss minimal UI: big preview, simple steps, clear progress and subtle microinteractions for customization toggles.",
+    styleTags: ["swiss", "avatar", "preview-first", "progress", "minimal-ui"],
+    layoutHints:
+      "Preview large and centered, controls in compact left/right rail, consistent spacing and easy undo microinteractions.",
+    density: "low",
+    examples: ["Nike", "Stellar"],
   },
-];
+] as const;
+
+export type InspirationPrompt = typeof INSPIRATION_PROMPTS_SWISS[number];
+export default INSPIRATION_PROMPTS_SWISS;

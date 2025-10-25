@@ -25,7 +25,7 @@ export function ChatErrorBox({
             href="https://dyad.sh/pro?utm_source=dyad-app&utm_medium=app&utm_campaign=free-quota-error"
             variant="primary"
           >
-            Access with Dyad Pro
+            Access with Suso Pro
           </ExternalLink>
         </span>{" "}
         or switch to another model.
@@ -48,7 +48,7 @@ export function ChatErrorBox({
             href="https://dyad.sh/pro?utm_source=dyad-app&utm_medium=app&utm_campaign=rate-limit-error"
             variant="primary"
           >
-            Upgrade to Dyad Pro
+            Upgrade to Suso Pro
           </ExternalLink>
 
           <ExternalLink href="https://dyad.sh/docs/help/ai-rate-limit">
@@ -63,12 +63,12 @@ export function ChatErrorBox({
     return (
       <ChatInfoContainer onDismiss={onDismiss}>
         <span>
-          Looks like you don't have a valid Dyad Pro key.{" "}
+          Looks like you don't have a valid Suso Pro key.{" "}
           <ExternalLink
             href="https://dyad.sh/pro?utm_source=dyad-app&utm_medium=app&utm_campaign=invalid-pro-key-error"
             variant="primary"
           >
-            Upgrade to Dyad Pro
+            Upgrade to Suso Pro
           </ExternalLink>{" "}
           today.
         </span>
@@ -79,7 +79,7 @@ export function ChatErrorBox({
     return (
       <ChatInfoContainer onDismiss={onDismiss}>
         <span>
-          You have used all of your Dyad AI credits this month.{" "}
+          You have used all of your Suso AI credits this month.{" "}
           <ExternalLink
             href="https://academy.dyad.sh/subscription?utm_source=dyad-app&utm_medium=app&utm_campaign=exceeded-budget-error"
             variant="primary"
@@ -104,7 +104,7 @@ export function ChatErrorBox({
             href="https://dyad.sh/pro?utm_source=dyad-app&utm_medium=app&utm_campaign=general-error"
             variant="primary"
           >
-            Upgrade to Dyad Pro
+            Upgrade to Suso Pro
           </ExternalLink>
         )}
 

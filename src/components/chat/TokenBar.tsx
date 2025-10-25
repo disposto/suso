@@ -159,7 +159,7 @@ export function TokenBar({ chatId }: TokenBarProps) {
             }
             className="text-blue-500 dark:text-blue-400 cursor-pointer hover:underline"
           >
-            Dyad Pro's Smart Context
+            Suso Pro Smart Context
           </a>
         </div>
       )}
