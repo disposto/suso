@@ -280,11 +280,12 @@ export function ModelPicker() {
             {/* Primary providers as submenus */}
             {primaryProviders.map(([providerId, models]) => {
               models = models.filter((model) => {
-                // Don't show free models if Dyad Pro is enabled because
-                // we will use the paid models (in Dyad Pro backend) which
-                // don't have the free limitations.
+                // Only hide free models when Dyad Pro is enabled AND a Dyad Pro API key exists.
+                // Without a key, keep free models visible so users can still select them.
+                const dyadApiKey = settings?.providerSettings?.auto?.apiKey?.value;
                 if (
                   isDyadProEnabled(settings) &&
+                  dyadApiKey &&
                   model.apiName.endsWith(":free")
                 ) {
                   return false;
