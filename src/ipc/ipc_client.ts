@@ -124,7 +124,28 @@ export class IpcClient {
   >;
   private mcpConsentHandlers: Map<string, (payload: any) => void>;
   private constructor() {
-    this.ipcRenderer = (window as any).electron.ipcRenderer as IpcRenderer;
+    // Guard: when running in plain web preview (without Electron), window.electron is undefined.
+    // Provide a minimal stub to avoid hard crashes, and throw on .invoke to make the limitation clear.
+    const w = window as any;
+    const electronIPC = w?.electron?.ipcRenderer as IpcRenderer | undefined;
+    if (electronIPC) {
+      this.ipcRenderer = electronIPC;
+    } else {
+      const stub = {
+        invoke: async (..._args: any[]) => {
+          throw new Error(
+            "IPC is only available inside Electron. Open the app window instead of the browser preview.",
+          );
+        },
+        on: (_channel: any, _listener: any) => {
+          // Silent no-op in web preview to avoid log spam
+          return () => {};
+        },
+        removeAllListeners: (_channel: any) => {},
+        removeListener: (_channel: any, _listener: any) => {},
+      } as unknown as IpcRenderer;
+      this.ipcRenderer = stub;
+    }
     this.chatStreams = new Map();
     this.appStreams = new Map();
     this.helpStreams = new Map();

@@ -14,8 +14,14 @@ import {
 import { showError, showMcpConsentToast } from "./lib/toast";
 import { IpcClient } from "./ipc/ipc_client";
 
-// @ts-ignore
-console.log("Running in mode:", import.meta.env.MODE);
+// Quiet dev logs in web preview (non-Electron) to avoid console spam
+const isElectron = !!(window as any)?.electron?.ipcRenderer;
+if (!isElectron) {
+  const noop = () => {};
+  // Keep warnings and errors, silence debug and log
+  console.debug = noop as any;
+  console.log = noop as any;
+}
 
 interface MyMeta extends Record<string, unknown> {
   showErrorToast: boolean;
@@ -57,14 +63,12 @@ const posthogClient = posthog.init(
   "phc_5Vxx0XT8Ug3eWROhP6mm4D6D2DgIIKT232q4AKxC2ab",
   {
     api_host: "https://us.i.posthog.com",
-    // @ts-ignore
-    debug: import.meta.env.MODE === "development",
+    debug: false, // reduce logs in dev
     autocapture: false,
     capture_exceptions: true,
     capture_pageview: false,
     before_send: (event) => {
       if (!isTelemetryOptedIn()) {
-        console.debug("Telemetry not opted in, skipping event");
         return null;
       }
       const telemetryUserId = getTelemetryUserId();
@@ -76,12 +80,6 @@ const posthogClient = posthog.init(
         event.properties["$ip"] = null;
       }
 
-      console.debug(
-        "Telemetry opted in - UUID:",
-        telemetryUserId,
-        "sending event",
-        event,
-      );
       return event;
     },
     persistence: "localStorage",

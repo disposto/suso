@@ -10,10 +10,11 @@ import { SetupBanner } from "@/components/SetupBanner";
 import { isPreviewOpenAtom } from "@/atoms/viewAtoms";
 import { useState, useEffect, useCallback } from "react";
 import { useStreamChat } from "@/hooks/useStreamChat";
+import type { HomeSubmitOptions } from "@/components/chat/types";
 import { HomeChatInput } from "@/components/chat/HomeChatInput";
 import { usePostHog } from "posthog-js/react";
 import { PrivacyBanner } from "@/components/TelemetryBanner";
-import { INSPIRATION_PROMPTS } from "@/prompts/inspiration_prompts";
+import INSPIRATION_PROMPTS from "@/prompts/inspiration_prompts";
 import { useAppVersion } from "@/hooks/useAppVersion";
 import {
   Dialog,
@@ -29,15 +30,11 @@ import { showError } from "@/lib/toast";
 import { invalidateAppQuery } from "@/hooks/useLoadApp";
 import { useQueryClient } from "@tanstack/react-query";
 
-import type { FileAttachment } from "@/ipc/ipc_types";
+
 import { NEON_TEMPLATE_IDS } from "@/shared/templates";
 import { neonTemplateHook } from "@/client_logic/template_hook";
 import { ProBanner } from "@/components/ProBanner";
 
-// Adding an export for attachments
-export interface HomeSubmitOptions {
-  attachments?: FileAttachment[];
-}
 
 export default function HomePage() {
   const [inputValue, setInputValue] = useAtom(homeChatInputValueAtom);
@@ -122,6 +119,18 @@ export default function HomePage() {
     const attachments = options?.attachments || [];
 
     if (!inputValue.trim() && attachments.length === 0) return;
+
+    const isElectron =
+      typeof window !== "undefined" &&
+      (window as any).electron &&
+      (window as any).electron.ipcRenderer;
+
+    if (!isElectron) {
+      showError(
+        "Criação de app disponível apenas na janela Electron. Abra o Suso pela janela Electron para usar esta função.",
+      );
+      return;
+    }
 
     try {
       setIsLoading(true);

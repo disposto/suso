@@ -6,6 +6,11 @@ import dotenv from "dotenv";
 import started from "electron-squirrel-startup";
 import { updateElectronApp, UpdateSourceType } from "update-electron-app";
 import log from "electron-log";
+
+// Suppress Electron security warnings in development to reduce console noise
+// This does not affect production builds (the warning is hidden there anyway)
+process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = "true";
+
 import {
   getSettingsFilePath,
   readSettings,
