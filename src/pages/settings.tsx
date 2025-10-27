@@ -52,19 +52,19 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen px-8 py-4">
-      <div className="max-w-5xl mx-auto">
+    <div className="min-h-screen px-6 pt-16 pb-12">
+      <div className="max-w-6xl mx-auto">
         <Button
           onClick={() => router.history.back()}
-          variant="outline"
+          variant="ghost"
           size="sm"
-          className="flex items-center gap-2 mb-4 bg-(--background-lightest) py-5"
+          className="flex items-center gap-2 mb-6 text-foreground/80 hover:opacity-80"
         >
           <ArrowLeft className="h-4 w-4" />
           Go Back
         </Button>
         <div className="flex justify-between mb-4">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">
             Settings
           </h1>
         </div>
@@ -76,7 +76,7 @@ export default function SettingsPage() {
 
           <div
             id="provider-settings"
-            className="bg-white dark:bg-gray-800 rounded-xl shadow-sm"
+            className="ui-card p-6"
           >
             <ProviderSettingsGrid />
           </div>
@@ -84,7 +84,7 @@ export default function SettingsPage() {
           <div className="space-y-6">
             <div
               id="telemetry"
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6"
+              className="ui-card p-6"
             >
               <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
                 Telemetry
@@ -106,10 +106,7 @@ export default function SettingsPage() {
           </div>
 
           {/* Integrations Section */}
-          <div
-            id="integrations"
-            className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6"
-          >
+          <div id="integrations" className="ui-card p-6">
             <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
               Integrations
             </h2>
@@ -122,10 +119,7 @@ export default function SettingsPage() {
           </div>
 
           {/* Tools (MCP) */}
-          <div
-            id="tools-mcp"
-            className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6"
-          >
+          <div id="tools-mcp" className="ui-card p-6">
             <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
               Tools (MCP)
             </h2>
@@ -133,10 +127,7 @@ export default function SettingsPage() {
           </div>
 
           {/* Experiments Section */}
-          <div
-            id="experiments"
-            className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6"
-          >
+          <div id="experiments" className="ui-card p-6">
             <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
               Experiments
             </h2>
@@ -175,7 +166,7 @@ export default function SettingsPage() {
           {/* Danger Zone */}
           <div
             id="danger-zone"
-            className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-red-200 dark:border-red-800"
+            className="ui-card p-6 border-red-200 dark:border-red-800"
           >
             <h2 className="text-lg font-medium text-red-600 dark:text-red-400 mb-4">
               Danger Zone
@@ -222,10 +213,7 @@ export function GeneralSettings({ appVersion }: { appVersion: string | null }) {
   const { theme, setTheme } = useTheme();
 
   return (
-    <div
-      id="general-settings"
-      className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6"
-    >
+    <div id="general-settings" className="ui-card p-6">
       <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
         General Settings
       </h2>
@@ -289,10 +277,7 @@ export function GeneralSettings({ appVersion }: { appVersion: string | null }) {
 
 export function WorkflowSettings() {
   return (
-    <div
-      id="workflow-settings"
-      className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6"
-    >
+    <div id="workflow-settings" className="ui-card p-6">
       <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
         Workflow Settings
       </h2>
@@ -315,10 +300,7 @@ export function WorkflowSettings() {
 }
 export function AISettings() {
   return (
-    <div
-      id="ai-settings"
-      className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6"
-    >
+    <div id="ai-settings" className="ui-card p-6">
       <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
         AI Settings
       </h2>

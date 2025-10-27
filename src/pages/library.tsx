@@ -11,10 +11,10 @@ export default function LibraryPage() {
     usePrompts();
 
   return (
-    <div className="min-h-screen px-8 py-6">
+    <div className="min-h-screen px-6 pt-16 pb-12">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold mr-4">Library: Prompts</h1>
+          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight mr-4">Library: Prompts</h1>
           <CreatePromptDialog onCreatePrompt={createPrompt} />
         </div>
 
@@ -63,7 +63,7 @@ function PromptCard({
   return (
     <div
       data-testid="prompt-card"
-      className="border rounded-lg p-4 bg-(--background-lightest) min-w-80"
+      className="ui-card p-4 min-w-80"
     >
       <div className="space-y-2">
         <div className="flex items-start justify-between">

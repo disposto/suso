@@ -20,7 +20,7 @@ Structure:
 # IPC & React query patterns
 
 
-Okay, I can help you summarize this pattern for creating a new Cursor rule, focusing on the TanStack Query integration and the preferred error handling strategy.
+Okay, I can help you summarize this pattern for creating a new Trae rule, focusing on the TanStack Query integration and the preferred error handling strategy.
 
 Here's a summary of the pattern:
 

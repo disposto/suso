@@ -197,71 +197,67 @@ export default function HomePage() {
 
   // Main Home Page Content
   return (
-    <div className="flex flex-col items-center justify-center max-w-3xl w-full m-auto p-8">
+    <div className="w-full">
       <SetupBanner />
 
-      <div className="w-full">
-        <ImportAppButton />
-        <HomeChatInput onSubmit={handleSubmit} />
+      {/* Hero minimalista com espaço negativo e foco no prompt */}
+      <div className="max-w-6xl mx-auto px-6 pt-24 pb-16">
+        <div className="max-w-3xl mx-auto space-y-6">
+          {/* Título principal */}
+          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-foreground">
+            Construa com Suso
+          </h1>
+          <HomeChatInput onSubmit={handleSubmit} />
 
-        <div className="flex flex-col gap-4 mt-2">
-          <div className="flex flex-wrap gap-4 justify-center">
+          {/* Ideias rápidas (chips minimalistas) */}
+          <div className="flex flex-wrap gap-3">
             {randomPrompts.map((item, index) => (
               <button
                 type="button"
                 key={index}
                 onClick={() => setInputValue(`Build me a ${item.label}`)}
-                className="flex items-center gap-3 px-4 py-2 rounded-xl border border-gray-200
-                           bg-white/50 backdrop-blur-sm
-                           transition-all duration-200
-                           hover:bg-white hover:shadow-md hover:border-gray-300
-                           active:scale-[0.98]
-                           dark:bg-gray-800/50 dark:border-gray-700
-                           dark:hover:bg-gray-800 dark:hover:border-gray-600"
+                className="flex items-center gap-2 px-3 py-2 rounded-[8px] border border-border text-foreground hover:opacity-90"
               >
-                <span className="text-gray-700 dark:text-gray-300">
-                  {item.icon}
-                </span>
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {item.label}
-                </span>
+                <span className="text-foreground/80">{item.icon}</span>
+                <span className="text-xs-sm font-medium">{item.label}</span>
               </button>
             ))}
           </div>
 
-          <button
-            type="button"
-            onClick={() => setRandomPrompts(getRandomPrompts())}
-            className="self-center flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200
-                       bg-white/50 backdrop-blur-sm
-                       transition-all duration-200
-                       hover:bg-white hover:shadow-md hover:border-gray-300
-                       active:scale-[0.98]
-                       dark:bg-gray-800/50 dark:border-gray-700
-                       dark:hover:bg-gray-800 dark:hover:border-gray-600"
-          >
-            <svg
-              className="w-5 h-5 text-gray-700 dark:text-gray-300"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+          <div className="flex justify-start">
+            <button
+              type="button"
+              onClick={() => setRandomPrompts(getRandomPrompts())}
+              className="flex items-center gap-2 px-3 py-2 rounded-[8px] border border-border text-foreground hover:opacity-90"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-              />
-            </svg>
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              More ideas
-            </span>
-          </button>
+              <svg
+                className="w-5 h-5 text-foreground/80"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
+              <span className="text-xs-sm font-medium">Mais ideias</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Bloco secundário: Import e banners, discretos e abaixo do hero */}
+      <div className="max-w-6xl mx-auto px-6 pb-12 space-y-4">
+        <div className="ui-card p-4">
+          <ImportAppButton />
         </div>
         <ProBanner />
+        <PrivacyBanner />
       </div>
-      <PrivacyBanner />
-
+    
       {/* Release Notes Dialog */}
       <Dialog open={releaseNotesOpen} onOpenChange={setReleaseNotesOpen}>
         <DialogContent className="max-w-4xl bg-(--docs-bg) pr-0 pt-4 pl-4 gap-1">

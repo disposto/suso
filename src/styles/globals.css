@@ -309,6 +309,69 @@
   font-size: 0.82rem;
 }
 
+/* ---- Swiss + Geist overrides appended (cascade last-wins) ---- */
+@layer base {
+  body {
+    font-family: "Geist", "Inter", system-ui, sans-serif;
+  }
+}
+
+.dark {
+  --docs-bg: #121212;
+  --background-lightest: #181818; /* cards */
+  --background-lighter: #1a1a1a;  /* inputs */
+  --background: #121212;          /* base */
+  --background-darker: #0f0f0f;
+  --background-darkest: #0c0c0c;
+  --foreground: #ffffff;
+  --card: #181818;
+  --card-foreground: #ffffff;
+  --popover: #151515;
+  --popover-foreground: #ffffff;
+  --primary: #4cf536;             /* ação/destaque */
+  --primary-foreground: #121212;
+  --secondary: #1a1a1a;           /* superfícies neutras */
+  --secondary-foreground: #ffffff;
+  --muted: #1a1a1a;
+  --muted-foreground: #A1A1A1;    /* texto secundário */
+  --accent: #42db30;              /* verde secundário */
+  --accent-foreground: #121212;
+  --border: rgba(255,255,255,0.08); /* separadores finos */
+  --input: rgba(255,255,255,0.08);
+}
+
+/* utilitários sem glow/sombra */
+.glow-card { box-shadow: none; }
+.glow-hover:hover { opacity: 0.9; }
+
+/* Prompt pill minimalista */
+.lovable-pill {
+  border-radius: 8px;
+  background: #1a1a1a;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.lovable-pill:focus-within { border-color: #4cf536; }
+
+/* Cards */
+.ui-card {
+  background: #181818;
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 8px;
+}
+
+/* Inputs */
+.ui-input {
+  background: #1a1a1a;
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #ffffff;
+  border-radius: 8px;
+}
+.ui-input::placeholder { color: #6e6e6e; }
+.ui-input:focus { outline: none; border-color: #4cf536; }
+
+/* Remover sombras globais para estilo Swiss */
+.shadow-sm, .shadow, .shadow-xs { box-shadow: none !important; }
+
 @theme inline {
   --container-6xs: 10rem;
   --container-5xs: 12rem;

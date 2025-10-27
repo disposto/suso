@@ -136,18 +136,34 @@ export function AppUpgrades({ appId }: { appId: number | null }) {
                   </Alert>
                 )}
               </div>
-              <Button
-                onClick={() => handleUpgrade(upgrade.id)}
-                disabled={isUpgrading && upgradingVariables === upgrade.id}
-                className="ml-4 flex-shrink-0"
-                size="sm"
-                data-testid={`app-upgrade-${upgrade.id}`}
-              >
-                {isUpgrading && upgradingVariables === upgrade.id ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : null}
-                Upgrade
-              </Button>
+              <div className="ml-4 flex-shrink-0 flex items-center gap-2">
+                <Button
+                  onClick={() => handleUpgrade(upgrade.id)}
+                  disabled={isUpgrading && upgradingVariables === upgrade.id}
+                  size="sm"
+                  data-testid={`app-upgrade-${upgrade.id}`}
+                >
+                  {isUpgrading && upgradingVariables === upgrade.id ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : null}
+                  Upgrade
+                </Button>
+                {upgrade.id === "capacitor" && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      IpcClient.getInstance().openExternalUrl(
+                        upgrade.manualUpgradeUrl ?? "https://dyad.sh/docs/guides/mobile-app",
+                      );
+                    }}
+                    className="text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100"
+                  >
+                    Ajuda
+                  </Button>
+                )}
+              </div>
             </div>
           ))}
         </div>

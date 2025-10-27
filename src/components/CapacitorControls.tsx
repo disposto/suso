@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { IpcClient } from "@/ipc/ipc_client";
 import { showSuccess } from "@/lib/toast";
@@ -32,6 +32,7 @@ interface CapacitorControlsProps {
 type CapacitorStatus = "idle" | "syncing" | "opening";
 
 export function CapacitorControls({ appId }: CapacitorControlsProps) {
+  const queryClient = useQueryClient();
   const [errorDialogOpen, setErrorDialogOpen] = useState(false);
   const [errorDetails, setErrorDetails] = useState<{
     title: string;
@@ -47,6 +48,12 @@ export function CapacitorControls({ appId }: CapacitorControlsProps) {
     enabled: appId !== undefined && appId !== null,
   });
 
+  // Detect system platform to guide availability (win32, darwin, linux)
+  const { data: systemPlatform } = useQuery({
+    queryKey: ["system-platform"],
+    queryFn: () => IpcClient.getInstance().getSystemPlatform(),
+  });
+
   const showErrorDialog = (title: string, error: unknown) => {
     const errorMessage = error instanceof Error ? error.message : String(error);
     setErrorDetails({ title, message: errorMessage });
@@ -57,6 +64,11 @@ export function CapacitorControls({ appId }: CapacitorControlsProps) {
   const syncAndOpenIosMutation = useMutation({
     mutationFn: async () => {
       setIosStatus("syncing");
+      // If Capacitor is not installed, perform the upgrade automatically
+      if (!isCapacitor) {
+        await IpcClient.getInstance().executeAppUpgrade({ appId, upgradeId: "capacitor" });
+        await queryClient.invalidateQueries({ queryKey: ["is-capacitor", appId] });
+      }
       // First sync
       await IpcClient.getInstance().syncCapacitor({ appId });
       setIosStatus("opening");
@@ -77,6 +89,11 @@ export function CapacitorControls({ appId }: CapacitorControlsProps) {
   const syncAndOpenAndroidMutation = useMutation({
     mutationFn: async () => {
       setAndroidStatus("syncing");
+      // If Capacitor is not installed, perform the upgrade automatically
+      if (!isCapacitor) {
+        await IpcClient.getInstance().executeAppUpgrade({ appId, upgradeId: "capacitor" });
+        await queryClient.invalidateQueries({ queryKey: ["is-capacitor", appId] });
+      }
       // First sync
       await IpcClient.getInstance().syncCapacitor({ appId });
       setAndroidStatus("opening");
@@ -101,7 +118,10 @@ export function CapacitorControls({ appId }: CapacitorControlsProps) {
       case "opening":
         return { main: "Opening...", sub: "Launching Xcode" };
       default:
-        return { main: "Sync & Open iOS", sub: "Xcode" };
+        return {
+          main: "Sync & Open iOS",
+          sub: systemPlatform === "darwin" ? "Xcode" : "Disponível apenas no macOS",
+        };
     }
   };
 
@@ -116,8 +136,8 @@ export function CapacitorControls({ appId }: CapacitorControlsProps) {
     }
   };
 
-  // Don't render anything if loading or if Capacitor is not installed
-  if (isLoading || !isCapacitor) {
+  // Don't render anything while loading
+  if (isLoading) {
     return null;
   }
 
@@ -130,20 +150,34 @@ export function CapacitorControls({ appId }: CapacitorControlsProps) {
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             Mobile Development
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                // TODO: Add actual help link
-                IpcClient.getInstance().openExternalUrl(
-                  "https://dyad.sh/docs/guides/mobile-app#troubleshooting",
-                );
-              }}
-              className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 flex items-center gap-1"
-            >
-              Need help?
-              <ExternalLink className="h-3 w-3" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  IpcClient.getInstance().openExternalUrl(
+                    "https://dyad.sh/docs/guides/mobile-app#troubleshooting",
+                  );
+                }}
+                className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 flex items-center gap-1"
+              >
+                Need help?
+                <ExternalLink className="h-3 w-3" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  IpcClient.getInstance().openExternalUrl(
+                    "https://nodejs.org/en/download/prebuilt-installer",
+                  );
+                }}
+                className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 flex items-center gap-1"
+              >
+                Install Node v20
+                <ExternalLink className="h-3 w-3" />
+              </Button>
+            </div>
           </CardTitle>
           <CardDescription>
             Sync and open your Capacitor mobile projects
@@ -153,11 +187,11 @@ export function CapacitorControls({ appId }: CapacitorControlsProps) {
           <div className="grid grid-cols-2 gap-2">
             <Button
               onClick={() => syncAndOpenIosMutation.mutate()}
-              disabled={syncAndOpenIosMutation.isPending}
+              disabled={syncAndOpenIosMutation.isPending || systemPlatform !== "darwin"}
               variant="outline"
               size="sm"
               className="flex items-center gap-2 h-10"
-            >
+              >
               {syncAndOpenIosMutation.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
@@ -191,6 +225,11 @@ export function CapacitorControls({ appId }: CapacitorControlsProps) {
               </div>
             </Button>
           </div>
+          {systemPlatform !== "darwin" && (
+            <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+              Nota: abrir o projeto iOS exige macOS + Xcode. No Windows/Linux, use apenas Android.
+            </div>
+          )}
         </CardContent>
       </Card>
 

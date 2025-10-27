@@ -61,8 +61,8 @@ export function HomeChatInput({
     <>
       <div className="p-4" data-testid="home-chat-input-container">
         <div
-          className={`relative flex flex-col space-y-2 border border-border rounded-lg bg-(--background-lighter) shadow-sm ${
-            isDraggingOver ? "ring-2 ring-blue-500 border-blue-500" : ""
+          className={`relative flex flex-col space-y-2 ui-card ${
+            isDraggingOver ? "border-primary" : ""
           }`}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
@@ -83,7 +83,7 @@ export function HomeChatInput({
               onChange={setInputValue}
               onSubmit={handleCustomSubmit}
               onPaste={handlePaste}
-              placeholder="Ask Suso to build..."
+              placeholder="Peça ao Suso para criar..."
               disabled={isStreaming}
               excludeCurrentApp={false}
             />
@@ -97,8 +97,8 @@ export function HomeChatInput({
 
             {isStreaming ? (
               <button
-                className="px-2 py-2 mt-1 mr-2 text-(--sidebar-accent-fg) rounded-lg opacity-50 cursor-not-allowed" // Indicate disabled state
-                title="Cancel generation (unavailable here)"
+                className="px-2 py-2 mt-1 mr-2 text-foreground rounded-[8px] opacity-50 cursor-not-allowed"
+                title="Cancelar geração (indisponível aqui)"
               >
                 <StopCircleIcon size={20} />
               </button>
@@ -106,8 +106,8 @@ export function HomeChatInput({
               <button
                 onClick={handleCustomSubmit}
                 disabled={!inputValue.trim() && attachments.length === 0}
-                className="px-2 py-2 mt-1 mr-2 hover:bg-(--background-darkest) text-(--sidebar-accent-fg) rounded-lg disabled:opacity-50"
-                title="Send message"
+                className="px-2 py-2 mt-1 mr-2 text-foreground rounded-[8px] hover:opacity-80 disabled:opacity-50"
+                title="Enviar mensagem"
               >
                 <SendIcon size={20} />
               </button>
