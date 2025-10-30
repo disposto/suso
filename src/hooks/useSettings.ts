@@ -20,6 +20,7 @@ export function getTelemetryUserId(): string | null {
 let isInitialLoad = false;
 
 export function useSettings() {
+  const isElectron = Boolean((window as any)?.electron?.ipcRenderer);
   const posthog = usePostHog();
   const [settings, setSettingsAtom] = useAtom(userSettingsAtom);
   const [envVars, setEnvVarsAtom] = useAtom(envVarsAtom);
@@ -29,6 +30,11 @@ export function useSettings() {
   const loadInitialData = useCallback(async () => {
     setLoading(true);
     try {
+      if (!isElectron) {
+        // In web preview, skip IPC; keep current atoms, no errors
+        setError(null);
+        return;
+      }
       const ipcClient = IpcClient.getInstance();
       // Fetch settings and env vars concurrently
       const [userSettings, fetchedEnvVars] = await Promise.all([
@@ -47,12 +53,12 @@ export function useSettings() {
       setEnvVarsAtom(fetchedEnvVars);
       setError(null);
     } catch (error) {
-      console.error("Error loading initial data:", error);
+      console.debug("Error loading initial data:", error);
       setError(error instanceof Error ? error : new Error(String(error)));
     } finally {
       setLoading(false);
     }
-  }, [setSettingsAtom, setEnvVarsAtom, appVersion]);
+  }, [setSettingsAtom, setEnvVarsAtom, appVersion, isElectron]);
 
   useEffect(() => {
     // Only run once on mount, dependencies are stable getters/setters
@@ -62,6 +68,14 @@ export function useSettings() {
   const updateSettings = async (newSettings: Partial<UserSettings>) => {
     setLoading(true);
     try {
+      if (!isElectron) {
+        // In web preview, skip IPC; echo the local change and avoid errors
+        const updatedSettings = { ...settings, ...newSettings } as UserSettings;
+        setSettingsAtom(updatedSettings);
+        processSettingsForTelemetry(updatedSettings);
+        setError(null);
+        return updatedSettings;
+      }
       const ipcClient = IpcClient.getInstance();
       const updatedSettings = await ipcClient.setUserSettings(newSettings);
       setSettingsAtom(updatedSettings);
@@ -70,7 +84,7 @@ export function useSettings() {
       setError(null);
       return updatedSettings;
     } catch (error) {
-      console.error("Error updating settings:", error);
+      console.debug("Error updating settings:", error);
       setError(error instanceof Error ? error : new Error(String(error)));
       throw error;
     } finally {

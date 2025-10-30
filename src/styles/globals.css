@@ -69,13 +69,14 @@
 }
 
 .h-screenish {
-  height: calc(100vh - 64px);
+  /* Match the current TitleBar height (h-10 = 40px) to avoid over-subtracting */
+  height: calc(100vh - 40px);
 }
 :root {
   --docs-bg: #f5f5f5;
 
-  --default-font-family: "Inter", system-ui, sans-serif;
-  --default-mono-font-family: "Geist Mono", monospace;
+  --default-font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", "Manrope", system-ui, sans-serif;
+  --default-mono-font-family: "SF Mono", "Monaco", "Cascadia Code", "Roboto Mono", "Courier New", monospace;
   /* --background: oklch(1 0 0); */
   --background-lightest: #fff;
   --background-lighter: oklch(0.995 0.0188 292.61);
@@ -88,6 +89,7 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
+  /* Default brand (will be overridden by theme wrappers like .theme-apple) */
   --primary: #42db30;
   /* --primary: oklch(0.205 0 0); */
   --primary-foreground: oklch(0.985 0 0);
@@ -215,7 +217,7 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: "Inter", system-ui, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", "Manrope", system-ui, sans-serif;
   }
 }
 
@@ -309,10 +311,13 @@
   font-size: 0.82rem;
 }
 
-/* ---- Swiss + Geist overrides appended (cascade last-wins) ---- */
+/* ---- Swiss Apple typography system ---- */
 @layer base {
   body {
-    font-family: "Geist", "Inter", system-ui, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", "Manrope", system-ui, sans-serif;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
@@ -354,9 +359,9 @@
 
 /* Cards */
 .ui-card {
-  background: #181818;
-  border: 1px solid rgba(255,255,255,0.05);
-  border-radius: 8px;
+  background: var(--background-lightest);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
 }
 
 /* Inputs */
@@ -371,6 +376,26 @@
 
 /* Remover sombras globais para estilo Swiss */
 .shadow-sm, .shadow, .shadow-xs { box-shadow: none !important; }
+
+/* Apple minimalist theme overrides */
+.theme-apple {
+  /* Light mode */
+  --primary: #0a84ff; /* iOS blue */
+  --primary-foreground: #ffffff;
+  --accent: #d1d1d6; /* system gray 3 */
+  --accent-foreground: #0c0c0c;
+  --border: rgba(0,0,0,0.12);
+  --radius: 0.75rem; /* 12px rounded corners */
+}
+.dark.theme-apple {
+  /* Dark mode */
+  --primary: #0a84ff;
+  --primary-foreground: #121212;
+  --accent: #1c1c1e; /* system gray 6 */
+  --accent-foreground: #ffffff;
+  --border: rgba(255,255,255,0.12);
+  --radius: 0.75rem;
+}
 
 @theme inline {
   --container-6xs: 10rem;

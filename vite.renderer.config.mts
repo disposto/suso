@@ -5,6 +5,16 @@ import { defineConfig } from "vite";
 
 // https://vite.dev/config/
 export default defineConfig({
+  server: {
+    // Force a single, predictable dev port to avoid mismatch with Electron
+    port: 5176,
+    strictPort: true,
+    hmr: {
+      protocol: "ws",
+      host: "localhost",
+      port: 5176,
+    },
+  },
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {

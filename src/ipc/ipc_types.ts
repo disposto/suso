@@ -119,6 +119,33 @@ export interface SandboxConfig {
   entry: string;
 }
 
+// --- Accounts ---
+export interface Account {
+  id: number;
+  provider: string;
+  externalId?: string | null;
+  email?: string | null;
+  name?: string | null;
+  avatarUrl?: string | null;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface UpsertAccountParams {
+  id?: number; // present for update
+  provider: string;
+  externalId?: string | null;
+  email?: string | null;
+  name?: string | null;
+  avatarUrl?: string | null;
+  isActive?: boolean;
+}
+
+export interface SetActiveAccountParams {
+  id: number;
+}
+
 export interface NodeSystemInfo {
   nodeVersion: string | null;
   pnpmVersion: string | null;

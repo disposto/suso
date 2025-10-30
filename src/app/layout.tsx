@@ -1,5 +1,6 @@
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/app-sidebar";
+// import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+// import { AppSidebar } from "@/components/app-sidebar";
+import { FloatingNav } from "@/components/FloatingNav";
 import { ThemeProvider } from "../contexts/ThemeContext";
 import { DeepLinkProvider } from "../contexts/DeepLinkContext";
 import { Toaster } from "sonner";
@@ -8,6 +9,8 @@ import { useEffect } from "react";
 import { useRunApp } from "@/hooks/useRunApp";
 import { useAtomValue } from "jotai";
 import { previewModeAtom } from "@/atoms/appAtoms";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import AuthPage from "@/pages/auth";
 
 export default function RootLayout({
   children,
@@ -16,6 +19,7 @@ export default function RootLayout({
 }) {
   const { refreshAppIframe } = useRunApp();
   const previewMode = useAtomValue(previewModeAtom);
+  const { isAuthenticated } = useSupabaseAuth();
   // Global keyboard listener for refresh events
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -41,17 +45,24 @@ export default function RootLayout({
     <>
       <ThemeProvider>
         <DeepLinkProvider>
-          <SidebarProvider>
+          <div className="theme-apple">
             <TitleBar />
-            <AppSidebar />
-            <div
-              id="layout-main-content-container"
-              className="flex h-screenish w-full overflow-x-hidden mt-12 mb-4 mr-4 border-t border-l border-border rounded-lg bg-background"
-            >
-              {children}
-            </div>
+            {/* If not authenticated, render only the Auth screen and avoid mounting app-side components */}
+            {isAuthenticated ? (
+              <>
+                <FloatingNav />
+                <div
+                  id="layout-main-content-container"
+                  className="min-h-screen w-full overflow-x-hidden pt-10 pb-28 border-t border-border bg-background"
+                >
+                  <div className="w-full">{children}</div>
+                </div>
+              </>
+            ) : (
+              <AuthPage />
+            )}
             <Toaster richColors />
-          </SidebarProvider>
+          </div>
         </DeepLinkProvider>
       </ThemeProvider>
     </>

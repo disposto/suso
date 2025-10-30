@@ -1,10 +1,11 @@
 import {
-  Home,
-  Inbox,
-  Settings,
-  HelpCircle,
-  Store,
-  BookOpen,
+  Grid2x2,
+  MessageSquare,
+  Cog,
+  LifeBuoy,
+  Boxes,
+  FolderOpen,
+  User,
 } from "lucide-react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useSidebar } from "@/components/ui/sidebar"; // import useSidebar hook
@@ -34,27 +35,32 @@ const items = [
   {
     title: "Apps",
     to: "/",
-    icon: Home,
+    icon: Grid2x2,
   },
   {
     title: "Chat",
     to: "/chat",
-    icon: Inbox,
+    icon: MessageSquare,
   },
   {
     title: "Settings",
     to: "/settings",
-    icon: Settings,
+    icon: Cog,
+  },
+  {
+    title: "Account",
+    to: "/account",
+    icon: User,
   },
   {
     title: "Library",
     to: "/library",
-    icon: BookOpen,
+    icon: FolderOpen,
   },
   {
     title: "Hub",
     to: "/hub",
-    icon: Store,
+    icon: Boxes,
   },
 ];
 
@@ -152,11 +158,10 @@ export function AppSidebar() {
             {/* Change button to open dialog instead of linking */}
             <SidebarMenuButton
               size="sm"
-              className="font-medium w-14 flex flex-col items-center gap-1 h-14 mb-2 rounded-2xl"
+              className="font-medium w-12 h-12 mb-2 rounded-lg flex items-center justify-center"
               onClick={() => setIsHelpDialogOpen(true)} // Open dialog on click
             >
-              <HelpCircle className="h-5 w-5" />
-              <span className={"text-xs"}>Help</span>
+              <LifeBuoy className="h-4 w-4" />
             </SidebarMenuButton>
             <HelpDialog
               isOpen={isHelpDialogOpen}
@@ -196,30 +201,29 @@ function AppIcons({
                 <SidebarMenuButton
                   asChild
                   size="sm"
-                  className="font-medium w-14"
+                  className="font-medium w-12"
                 >
                   <Link
                     to={item.to}
-                    className={`flex flex-col items-center gap-1 h-14 mb-2 rounded-2xl ${
-                      isActive ? "bg-sidebar-accent" : ""
-                    }`}
-                    onMouseEnter={() => {
-                      if (item.title === "Apps") {
-                        onHoverChange("start-hover:app");
-                      } else if (item.title === "Chat") {
-                        onHoverChange("start-hover:chat");
-                      } else if (item.title === "Settings") {
-                        onHoverChange("start-hover:settings");
-                      } else if (item.title === "Library") {
-                        onHoverChange("start-hover:library");
-                      }
-                    }}
-                  >
-                    <div className="flex flex-col items-center gap-1">
-                      <item.icon className="h-5 w-5" />
-                      <span className={"text-xs"}>{item.title}</span>
-                    </div>
-                  </Link>
+                    className={`flex items-center justify-center h-12 mb-2 rounded-lg border ${
+                      isActive
+                        ? "border-(--accent) bg-(--background-lightest) text-(--accent)"
+                        : "border-(--border) bg-(--background) hover:bg-(--background-lightest)"
+                    } transition-colors`}
+                  onMouseEnter={() => {
+                    if (item.title === "Apps") {
+                      onHoverChange("start-hover:app");
+                    } else if (item.title === "Chat") {
+                      onHoverChange("start-hover:chat");
+                    } else if (item.title === "Settings") {
+                      onHoverChange("start-hover:settings");
+                    } else if (item.title === "Library") {
+                      onHoverChange("start-hover:library");
+                    }
+                  }}
+                >
+                  <item.icon className="h-4 w-4" />
+                </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             );

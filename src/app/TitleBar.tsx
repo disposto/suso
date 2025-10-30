@@ -23,6 +23,8 @@ import {
 import { ActionHeader } from "@/components/preview_panel/ActionHeader";
 
 export const TitleBar = () => {
+  // Detect if running inside Electron (preload exposes window.electron.ipcRenderer)
+  const isElectron = Boolean((window as any)?.electron?.ipcRenderer);
   const [selectedAppId] = useAtom(selectedAppIdAtom);
   const { apps } = useLoadApps();
   const { navigate } = useRouter();
@@ -34,16 +36,22 @@ export const TitleBar = () => {
   useEffect(() => {
     // Check if we're running on Windows
     const checkPlatform = async () => {
+      // Avoid IPC calls when previewing in a plain browser (outside Electron)
+      if (!isElectron) {
+        setShowWindowControls(false);
+        return;
+      }
       try {
         const platform = await IpcClient.getInstance().getSystemPlatform();
         setShowWindowControls(platform !== "darwin");
       } catch (error) {
-        console.error("Failed to get platform info:", error);
+        // In the unlikely case of an IPC error inside Electron, log as debug to avoid noisy console errors
+        console.debug("Failed to get platform info:", error);
       }
     };
 
     checkPlatform();
-  }, []);
+  }, [isElectron]);
 
   const showDyadProSuccessDialog = () => {
     setIsSuccessDialogOpen(true);
@@ -78,10 +86,10 @@ export const TitleBar = () => {
 
   return (
     <>
-      <div className="@container z-11 w-full h-11 bg-(--sidebar) absolute top-0 left-0 app-region-drag flex items-center">
+      <div className="@container z-11 w-full h-10 bg-(--background) border-b border-(--border) absolute top-0 left-0 app-region-drag flex items-center">
         <div className={`${showWindowControls ? "pl-2" : "pl-18"}`}></div>
 
-        <img src={logo} alt="Suso Logo" className="w-6 h-6 mr-0.5" />
+        <img src={logo} alt="Suso Logo" className="w-5 h-5 mr-1" />
         <Button
           data-testid="title-bar-app-name-button"
           variant="outline"
@@ -132,7 +140,7 @@ function WindowsControls() {
   return (
     <div className="ml-auto flex no-app-region-drag">
       <button
-        className="w-10 h-10 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+        className="w-9 h-9 flex items-center justify-center hover:bg-(--background-lightest) transition-colors"
         onClick={minimizeWindow}
         aria-label="Minimize"
       >
@@ -151,7 +159,7 @@ function WindowsControls() {
         </svg>
       </button>
       <button
-        className="w-10 h-10 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+        className="w-9 h-9 flex items-center justify-center hover:bg-(--background-lightest) transition-colors"
         onClick={maximizeWindow}
         aria-label="Maximize"
       >
@@ -172,7 +180,7 @@ function WindowsControls() {
         </svg>
       </button>
       <button
-        className="w-10 h-10 flex items-center justify-center hover:bg-red-500 transition-colors"
+        className="w-9 h-9 flex items-center justify-center hover:bg-red-500 transition-colors"
         onClick={closeWindow}
         aria-label="Close"
       >
@@ -212,8 +220,8 @@ export function DyadProButton({
       }}
       variant="outline"
       className={cn(
-        "hidden @2xl:block ml-1 no-app-region-drag h-7 bg-indigo-600 text-white dark:bg-indigo-600 dark:text-white text-xs px-2 pt-1 pb-1",
-        !isDyadProEnabled && "bg-zinc-600 dark:bg-zinc-600",
+        "hidden @2xl:block ml-1 no-app-region-drag h-7 bg-primary text-primary-foreground text-xs px-2 pt-1 pb-1",
+        !isDyadProEnabled && "bg-muted text-muted-foreground",
       )}
       size="sm"
     >

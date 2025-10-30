@@ -25,7 +25,6 @@ import {
 import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
-import { ImportAppButton } from "@/components/ImportAppButton";
 import { showError } from "@/lib/toast";
 import { invalidateAppQuery } from "@/hooks/useLoadApp";
 import { useQueryClient } from "@tanstack/react-query";
@@ -70,6 +69,11 @@ export default function HomePage() {
         }
 
         try {
+          const isElectron = Boolean((window as any)?.electron?.ipcRenderer);
+          if (!isElectron) {
+            // Skip IPC call in web preview
+            return;
+          }
           const result = await IpcClient.getInstance().doesReleaseNoteExist({
             version: appVersion,
           });
@@ -79,7 +83,7 @@ export default function HomePage() {
             setReleaseNotesOpen(true);
           }
         } catch (err) {
-          console.warn(
+          console.debug(
             "Unable to check if release note exists for: " + appVersion,
             err,
           );
@@ -197,63 +201,58 @@ export default function HomePage() {
 
   // Main Home Page Content
   return (
-    <div className="w-full">
+    <div className="pt-8 pb-8">
       <SetupBanner />
 
-      {/* Hero minimalista com espaço negativo e foco no prompt */}
-      <div className="max-w-6xl mx-auto px-6 pt-24 pb-16">
-        <div className="max-w-3xl mx-auto space-y-6">
-          {/* Título principal */}
-          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-foreground">
-            Construa com Suso
-          </h1>
-          <HomeChatInput onSubmit={handleSubmit} />
+      {/* Hero minimalista com proporções corrigidas e foco no prompt */}
+      <div className="max-w-3xl mx-auto space-y-6 mb-12">
+        {/* Título principal */}
+        <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-foreground">
+          Construa com Suso
+        </h1>
+        <HomeChatInput onSubmit={handleSubmit} />
 
-          {/* Ideias rápidas (chips minimalistas) */}
-          <div className="flex flex-wrap gap-3">
-            {randomPrompts.map((item, index) => (
-              <button
-                type="button"
-                key={index}
-                onClick={() => setInputValue(`Build me a ${item.label}`)}
-                className="flex items-center gap-2 px-3 py-2 rounded-[8px] border border-border text-foreground hover:opacity-90"
-              >
-                <span className="text-foreground/80">{item.icon}</span>
-                <span className="text-xs-sm font-medium">{item.label}</span>
-              </button>
-            ))}
-          </div>
-
-          <div className="flex justify-start">
+        {/* Ideias rápidas (chips minimalistas) */}
+        <div className="flex flex-wrap gap-3">
+          {randomPrompts.map((item, index) => (
             <button
               type="button"
-              onClick={() => setRandomPrompts(getRandomPrompts())}
+              key={index}
+              onClick={() => setInputValue(`Build me a ${item.label}`)}
               className="flex items-center gap-2 px-3 py-2 rounded-[8px] border border-border text-foreground hover:opacity-90"
             >
-              <svg
-                className="w-5 h-5 text-foreground/80"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                />
-              </svg>
-              <span className="text-xs-sm font-medium">Mais ideias</span>
+              <span className="text-foreground/80">{item.icon}</span>
+              <span className="text-xs-sm font-medium">{item.label}</span>
             </button>
-          </div>
+          ))}
+        </div>
+
+        <div className="flex justify-start">
+          <button
+            type="button"
+            onClick={() => setRandomPrompts(getRandomPrompts())}
+            className="flex items-center gap-2 px-3 py-2 rounded-[8px] border border-border text-foreground hover:opacity-90"
+          >
+            <svg
+              className="w-5 h-5 text-foreground/80"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+            <span className="text-xs-sm font-medium">Mais ideias</span>
+          </button>
         </div>
       </div>
 
-      {/* Bloco secundário: Import e banners, discretos e abaixo do hero */}
-      <div className="max-w-6xl mx-auto px-6 pb-12 space-y-4">
-        <div className="ui-card p-4">
-          <ImportAppButton />
-        </div>
+      {/* Bloco secundário: banners abaixo do hero */}
+      <div className="space-y-4">
         <ProBanner />
         <PrivacyBanner />
       </div>

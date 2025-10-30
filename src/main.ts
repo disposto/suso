@@ -307,13 +307,23 @@ function handleDeepLinkReturn(url: string) {
     return;
   }
   if (parsed.hostname === "supabase-oauth-return") {
-    const token = parsed.searchParams.get("token");
-    const refreshToken = parsed.searchParams.get("refreshToken");
-    const expiresIn = Number(parsed.searchParams.get("expiresIn"));
+    // Support both our normalized query names and Supabase defaults
+    const token =
+      parsed.searchParams.get("token") ||
+      parsed.searchParams.get("access_token") ||
+      parsed.searchParams.get("accessToken");
+    const refreshToken =
+      parsed.searchParams.get("refreshToken") ||
+      parsed.searchParams.get("refresh_token") ||
+      parsed.searchParams.get("refreshToken");
+    const expiresInParam =
+      parsed.searchParams.get("expiresIn") ||
+      parsed.searchParams.get("expires_in");
+    const expiresIn = Number(expiresInParam);
     if (!token || !refreshToken || !expiresIn) {
       dialog.showErrorBox(
         "Invalid URL",
-        "Expected token, refreshToken, and expiresIn",
+        "Expected token/access_token, refreshToken/refresh_token, and expiresIn/expires_in",
       );
       return;
     }

@@ -29,8 +29,7 @@ const HubPage: React.FC = () => {
     templates?.filter((template) => !template.isOfficial) || [];
 
   return (
-    <div className="min-h-screen px-6 pt-16 pb-12">
-      <div className="max-w-6xl mx-auto pb-12">
+    <div className="pt-8 pb-8">
         <Button
           onClick={() => router.history.back()}
           variant="ghost"
@@ -91,7 +90,6 @@ const HubPage: React.FC = () => {
         )}
 
         <BackendSection />
-      </div>
 
       <CreateAppDialog
         open={isCreateDialogOpen}

@@ -202,17 +202,17 @@ export default function AppDetailsPage() {
 
   if (!selectedApp) {
     return (
-      <div className="relative min-h-screen p-8">
+      <div className="relative pt-8 pb-8">
         <Button
           onClick={() => router.history.back()}
           variant="outline"
           size="sm"
-          className="absolute top-4 left-4 flex items-center gap-1 bg-(--background-lightest) py-5"
+          className="absolute top-8 left-4 flex items-center gap-1 bg-(--background-lightest) py-2"
         >
           <ArrowLeft className="h-3 w-4" />
           Back
         </Button>
-        <div className="flex flex-col items-center justify-center h-full">
+        <div className="flex flex-col items-center justify-center">
           <h2 className="text-xl font-bold">App not found</h2>
         </div>
       </div>
@@ -223,20 +223,20 @@ export default function AppDetailsPage() {
 
   return (
     <div
-      className="relative min-h-screen p-4 w-full"
+      className="relative pt-8 pb-8 w-full"
       data-testid="app-details-page"
     >
       <Button
         onClick={() => router.history.back()}
         variant="outline"
         size="sm"
-        className="absolute top-4 left-4 flex items-center gap-1 bg-(--background-lightest) py-2"
+        className="absolute top-8 left-4 flex items-center gap-1 bg-(--background-lightest) py-2"
       >
         <ArrowLeft className="h-3 w-4" />
         Back
       </Button>
 
-      <div className="w-full max-w-2xl mx-auto mt-10 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm relative">
+      <div className="w-full max-w-2xl mx-auto mt-8 p-4 ui-card relative">
         <div className="flex items-center mb-3">
           <h2 className="text-2xl font-bold">{selectedApp.name}</h2>
           <Button

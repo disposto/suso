@@ -1340,4 +1340,25 @@ export class IpcClient {
   public cancelHelpChat(sessionId: string): void {
     this.ipcRenderer.invoke("help:chat:cancel", sessionId).catch(() => {});
   }
+
+  // --- Accounts ---
+  public async listAccounts(): Promise<Account[]> {
+    return this.ipcRenderer.invoke("accounts:list");
+  }
+
+  public async upsertAccount(params: {
+    id?: number;
+    provider: string;
+    externalId?: string | null;
+    email?: string | null;
+    name?: string | null;
+    avatarUrl?: string | null;
+    isActive?: boolean;
+  }): Promise<Account[]> {
+    return this.ipcRenderer.invoke("accounts:upsert", params);
+  }
+
+  public async setActiveAccount(params: { id: number }): Promise<Account[]> {
+    return this.ipcRenderer.invoke("accounts:set-active", params);
+  }
 }

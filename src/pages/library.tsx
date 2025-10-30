@@ -11,32 +11,30 @@ export default function LibraryPage() {
     usePrompts();
 
   return (
-    <div className="min-h-screen px-6 pt-16 pb-12">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight mr-4">Library: Prompts</h1>
-          <CreatePromptDialog onCreatePrompt={createPrompt} />
-        </div>
-
-        {isLoading ? (
-          <div>Loading...</div>
-        ) : prompts.length === 0 ? (
-          <div className="text-muted-foreground">
-            No prompts yet. Create one to get started.
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-            {prompts.map((p) => (
-              <PromptCard
-                key={p.id}
-                prompt={p}
-                onUpdate={updatePrompt}
-                onDelete={deletePrompt}
-              />
-            ))}
-          </div>
-        )}
+    <div className="pt-8 pb-8">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl md:text-3xl font-semibold tracking-tight mr-4">Library: Prompts</h1>
+        <CreatePromptDialog onCreatePrompt={createPrompt} />
       </div>
+
+      {isLoading ? (
+        <div>Loading...</div>
+      ) : prompts.length === 0 ? (
+        <div className="text-muted-foreground">
+          No prompts yet. Create one to get started.
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+          {prompts.map((p) => (
+            <PromptCard
+              key={p.id}
+              prompt={p}
+              onUpdate={updatePrompt}
+              onDelete={deletePrompt}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

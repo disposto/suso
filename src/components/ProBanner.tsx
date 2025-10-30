@@ -46,17 +46,17 @@ export function ProBanner() {
 export function ManageDyadProButton() {
   return (
     <Button
-      variant="outline"
+      variant="default"
       size="lg"
-      className="w-full mt-4 bg-(--background-lighter) text-primary"
+      className="group w-full mt-4 py-5 ring-4 ring-primary/60 shadow-lg shadow-primary/30 border border-primary/60 bg-gradient-to-br from-primary/90 via-primary to-primary/80 text-primary-foreground hover:from-primary hover:to-primary/90 transition-all"
       onClick={() => {
         IpcClient.getInstance().openExternalUrl(
           "https://academy.dyad.sh/subscription",
         );
       }}
     >
-      <KeyRound aria-hidden="true" />
-      Manage Suso Pro subscription
+      <KeyRound aria-hidden="true" className="mr-2 h-4 w-4" />
+      <span className="font-semibold">Manage Suso Pro Subscription</span>
     </Button>
   );
 }

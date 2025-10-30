@@ -208,3 +208,20 @@ export const versionsRelations = relations(versions, ({ one }) => ({
     references: [apps.id],
   }),
 }));
+
+// --- Accounts table ---
+export const accounts = pgTable("accounts", {
+  id: serial("id").primaryKey(),
+  provider: text("provider").notNull(),
+  externalId: text("external_id"),
+  email: text("email"),
+  name: text("name"),
+  avatarUrl: text("avatar_url"),
+  isActive: boolean("is_active").notNull().default(false),
+  createdAt: timestamp("created_at", { mode: "date" })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { mode: "date" })
+    .notNull()
+    .defaultNow(),
+});

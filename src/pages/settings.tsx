@@ -52,8 +52,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen px-6 pt-16 pb-12">
-      <div className="max-w-6xl mx-auto">
+    <div className="pt-8 pb-8">
         <Button
           onClick={() => router.history.back()}
           variant="ghost"
@@ -194,8 +193,7 @@ export default function SettingsPage() {
             </div>
           </div>
         </div>
-      </div>
-
+      
       <ConfirmationDialog
         isOpen={isResetDialogOpen}
         title="Reset Everything"

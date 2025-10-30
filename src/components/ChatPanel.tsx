@@ -42,22 +42,19 @@ export function ChatPanel({
   const [showScrollButton, setShowScrollButton] = useState(false);
   const userScrollTimeoutRef = useRef<number | null>(null);
   const lastScrollTopRef = useRef<number>(0);
+  const scrollContainerRef = useRef<HTMLElement | null>(null);
   const scrollToBottom = (behavior: ScrollBehavior = "smooth") => {
     messagesEndRef.current?.scrollIntoView({ behavior });
   };
 
   const handleScrollButtonClick = () => {
-    if (!messagesContainerRef.current) return;
-
     scrollToBottom("smooth");
   };
 
   const getDistanceFromBottom = () => {
-    if (!messagesContainerRef.current) return 0;
-    const container = messagesContainerRef.current;
-    return (
-      container.scrollHeight - (container.scrollTop + container.clientHeight)
-    );
+    const el = messagesContainerRef.current;
+    if (!el) return 0;
+    return el.scrollHeight - (el.scrollTop + el.clientHeight);
   };
 
   const isNearBottom = (threshold: number = 100) => {
@@ -67,12 +64,7 @@ export function ChatPanel({
   const scrollAwayThreshold = 150; // pixels from bottom to consider "scrolled away"
 
   const handleScroll = useCallback(() => {
-    if (!messagesContainerRef.current) return;
-
-    const container = messagesContainerRef.current;
-    const distanceFromBottom =
-      container.scrollHeight - (container.scrollTop + container.clientHeight);
-
+    const distanceFromBottom = getDistanceFromBottom();
     // User has scrolled away from bottom
     if (distanceFromBottom > scrollAwayThreshold) {
       setIsUserScrolling(true);
@@ -90,7 +82,9 @@ export function ChatPanel({
       setIsUserScrolling(false);
       setShowScrollButton(false);
     }
-    lastScrollTopRef.current = container.scrollTop;
+    if (messagesContainerRef.current) {
+      lastScrollTopRef.current = messagesContainerRef.current.scrollTop;
+    }
   }, []);
 
   useEffect(() => {
@@ -100,14 +94,15 @@ export function ChatPanel({
   }, [chatId, chatId ? (streamCountById.get(chatId) ?? 0) : 0]);
 
   useEffect(() => {
-    const container = messagesContainerRef.current;
-    if (container) {
-      container.addEventListener("scroll", handleScroll, { passive: true });
+    const target = messagesContainerRef.current;
+    if (target) {
+      target.addEventListener("scroll", handleScroll as EventListener, {
+        passive: true,
+      } as AddEventListenerOptions);
     }
-
     return () => {
-      if (container) {
-        container.removeEventListener("scroll", handleScroll);
+      if (target) {
+        target.removeEventListener("scroll", handleScroll as EventListener);
       }
       if (userScrollTimeoutRef.current) {
         window.clearTimeout(userScrollTimeoutRef.current);
@@ -137,12 +132,7 @@ export function ChatPanel({
 
   // Auto-scroll effect when messages change during streaming
   useEffect(() => {
-    if (
-      !isUserScrolling &&
-      isStreaming &&
-      messagesContainerRef.current &&
-      messages.length > 0
-    ) {
+    if (!isUserScrolling && isStreaming && messages.length > 0) {
       // Only auto-scroll if user is close to bottom
       if (isNearBottom(280)) {
         requestAnimationFrame(() => {
@@ -160,10 +150,10 @@ export function ChatPanel({
         onTogglePreview={onTogglePreview}
         onVersionClick={() => setIsVersionPaneOpen(!isVersionPaneOpen)}
       />
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1">
         {!isVersionPaneOpen && (
           <div className="flex-1 flex flex-col min-w-0">
-            <div className="flex-1 relative overflow-hidden">
+            <div className="flex-1">
               <MessagesList
                 messages={messages}
                 messagesEndRef={messagesEndRef}
