@@ -24,6 +24,8 @@ import { useProposal } from "./useProposal";
 import { useSearch } from "@tanstack/react-router";
 import { useRunApp } from "./useRunApp";
 import { useCountTokens } from "./useCountTokens";
+import { useMobileCredits } from "./useMobileCredits";
+import { useSupabaseAuth } from "./useSupabaseAuth";
 import { useUserBudgetInfo } from "./useUserBudgetInfo";
 import { usePostHog } from "posthog-js/react";
 import { useCheckProblems } from "./useCheckProblems";
@@ -55,6 +57,8 @@ export function useStreamChat({
   const { settings } = useSettings();
   const setRecentStreamChatIds = useSetAtom(recentStreamChatIdsAtom);
   const posthog = usePostHog();
+  const { mobileCredits, adjustMobileCredits, refresh: refreshMobileCredits } = useMobileCredits();
+  const { user } = useSupabaseAuth();
   let chatId: number | undefined;
 
   if (hasChatId) {
@@ -103,11 +107,27 @@ export function useStreamChat({
 
       let hasIncrementedStreamCount = false;
       try {
+        // If mobile mode is selected, enforce login and credits before streaming
+        if (settings?.selectedChatMode === "mobile") {
+          if (!user) {
+            throw new Error("Login required to use Mobile mode");
+          }
+          const balance = mobileCredits?.balance ?? 0;
+          if (balance <= 0) {
+            throw new Error("Insufficient mobile credits");
+          }
+          // Decrement one mobile credit optimistically before starting the stream
+          // If this fails, stream will not start.
+          await adjustMobileCredits({ delta: -1 });
+          await refreshMobileCredits();
+        }
+
         IpcClient.getInstance().streamMessage(prompt, {
           selectedComponent: selectedComponent ?? null,
           chatId,
           redo,
           attachments,
+          mobileCreditConsumed: settings?.selectedChatMode === "mobile" ? true : undefined,
           onUpdate: (updatedMessages: Message[]) => {
             if (!hasIncrementedStreamCount) {
               setStreamCountById((prev) => {
@@ -156,6 +176,12 @@ export function useStreamChat({
           },
           onError: (errorMessage: string) => {
             console.error(`[CHAT] Stream error for ${chatId}:`, errorMessage);
+            // If mobile mode, refund the previously decremented credit when a stream fails
+            if (settings?.selectedChatMode === "mobile" && user) {
+              adjustMobileCredits({ delta: 1 }).finally(() => {
+                refreshMobileCredits();
+              });
+            }
             setErrorById((prev) => {
               const next = new Map(prev);
               next.set(chatId, errorMessage);
@@ -200,6 +226,9 @@ export function useStreamChat({
       selectedAppId,
       refetchUserBudget,
       settings,
+      user,
+      adjustMobileCredits,
+      refreshMobileCredits,
     ],
   );
 

@@ -33,6 +33,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { NEON_TEMPLATE_IDS } from "@/shared/templates";
 import { neonTemplateHook } from "@/client_logic/template_hook";
 import { ProBanner } from "@/components/ProBanner";
+import { MyAppsSection } from "@/components/home/MyAppsSection";
+import { CommunityTemplatesSection } from "@/components/home/CommunityTemplatesSection";
 
 
 export default function HomePage() {
@@ -256,6 +258,12 @@ export default function HomePage() {
         <ProBanner />
         <PrivacyBanner />
       </div>
+
+      {/* Meus Apps - seção estilo Lovable */}
+      <MyAppsSection />
+
+      {/* Templates da Comunidade com ranking por uso */}
+      <CommunityTemplatesSection />
     
       {/* Release Notes Dialog */}
       <Dialog open={releaseNotesOpen} onOpenChange={setReleaseNotesOpen}>

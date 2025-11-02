@@ -411,6 +411,7 @@ export class IpcClient {
       chatId: number;
       redo?: boolean;
       attachments?: FileAttachment[];
+      mobileCreditConsumed?: boolean;
       onUpdate: (messages: Message[]) => void;
       onEnd: (response: ChatResponseEnd) => void;
       onError: (error: string) => void;
@@ -422,6 +423,7 @@ export class IpcClient {
       redo,
       attachments,
       selectedComponent,
+      mobileCreditConsumed,
       onUpdate,
       onEnd,
       onError,
@@ -462,6 +464,7 @@ export class IpcClient {
               chatId,
               redo,
               selectedComponent,
+              mobileCreditConsumed,
               attachments: fileDataArray,
             })
             .catch((err) => {
@@ -483,6 +486,7 @@ export class IpcClient {
           chatId,
           redo,
           selectedComponent,
+          mobileCreditConsumed,
         })
         .catch((err) => {
           showError(err);
@@ -506,6 +510,16 @@ export class IpcClient {
   // Create a new chat for an app
   public async createChat(appId: number): Promise<number> {
     return this.ipcRenderer.invoke("create-chat", appId);
+  }
+
+  // Create or get the per-app configuration chat
+  public async createAppConfigChat(appId: number): Promise<number> {
+    return this.ipcRenderer.invoke("create-app-config-chat", appId);
+  }
+
+  // Create or get the per-app mobile configuration chat
+  public async createMobileConfigChat(appId: number): Promise<number> {
+    return this.ipcRenderer.invoke("create-mobile-config-chat", appId);
   }
 
   public async updateChat(params: UpdateChatParams): Promise<void> {
@@ -1282,6 +1296,10 @@ export class IpcClient {
 
   public async openAndroid(params: { appId: number }): Promise<void> {
     return this.ipcRenderer.invoke("open-android", params);
+  }
+
+  public async buildApk(params: { appId: number }): Promise<string> {
+    return this.ipcRenderer.invoke("build-apk", params);
   }
 
   public async checkProblems(params: {

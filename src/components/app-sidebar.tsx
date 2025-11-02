@@ -12,6 +12,7 @@ import { useSidebar } from "@/components/ui/sidebar"; // import useSidebar hook
 import { useEffect, useState, useRef } from "react";
 import { useAtom } from "jotai";
 import { dropdownOpenAtom } from "@/atoms/uiAtoms";
+import { useActiveAccount } from "@/hooks/useActiveAccount";
 
 import {
   Sidebar,
@@ -183,6 +184,10 @@ function AppIcons({
 }) {
   const routerState = useRouterState();
   const pathname = routerState.location.pathname;
+  const { activeAccount } = useActiveAccount();
+  const avatarUrl = activeAccount?.avatarUrl || "";
+  const nameOrEmail = (activeAccount?.name || activeAccount?.email || "").trim();
+  const avatarLabel = (nameOrEmail || "U").slice(0, 1).toUpperCase();
 
   return (
     // When collapsed: only show the main menu
@@ -222,7 +227,21 @@ function AppIcons({
                     }
                   }}
                 >
-                  <item.icon className="h-4 w-4" />
+                  {item.title === "Account" ? (
+                    avatarUrl ? (
+                      <img
+                        src={avatarUrl}
+                        alt={nameOrEmail || "Usuário"}
+                        className="h-5 w-5 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="h-5 w-5 rounded-full bg-(--background-lightest) text-[11px] flex items-center justify-center text-muted-foreground">
+                        {avatarLabel}
+                      </div>
+                    )
+                  ) : (
+                    <item.icon className="h-4 w-4" />
+                  )}
                 </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

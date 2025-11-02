@@ -15,7 +15,7 @@ import { useEffect, useRef, useState } from "react";
 import { PanelGroup, Panel, PanelResizeHandle } from "react-resizable-panels";
 import { Console } from "./Console";
 import { useRunApp } from "@/hooks/useRunApp";
-import { PublishPanel } from "./PublishPanel";
+import { MobilePanel } from "./MobilePanel";
 
 interface ConsoleHeaderProps {
   isOpen: boolean;
@@ -118,7 +118,7 @@ export function PreviewPanel() {
               ) : previewMode === "configure" ? (
                 <ConfigurePanel />
               ) : previewMode === "publish" ? (
-                <PublishPanel />
+                <MobilePanel />
               ) : (
                 <Problems />
               )}

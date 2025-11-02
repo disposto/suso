@@ -98,6 +98,42 @@ export function ChatHeader({
     }
   };
 
+  const handleOpenAppConfigChat = async () => {
+    if (appId) {
+      try {
+        const chatId = await IpcClient.getInstance().createAppConfigChat(appId);
+        setSelectedChatId(chatId);
+        navigate({
+          to: "/chat",
+          search: { id: chatId },
+        });
+        await refreshChats();
+      } catch (error) {
+        showError(`Failed to open App Config chat: ${(error as any).toString()}`);
+      }
+    } else {
+      navigate({ to: "/" });
+    }
+  };
+
+  const handleOpenMobileConfigChat = async () => {
+    if (appId) {
+      try {
+        const chatId = await IpcClient.getInstance().createMobileConfigChat(appId);
+        setSelectedChatId(chatId);
+        navigate({
+          to: "/chat",
+          search: { id: chatId },
+        });
+        await refreshChats();
+      } catch (error) {
+        showError(`Failed to open Mobile Config chat: ${(error as any).toString()}`);
+      }
+    } else {
+      navigate({ to: "/" });
+    }
+  };
+
   // REMINDER: KEEP UP TO DATE WITH app_handlers.ts
   const versionPostfix = versions.length === 100_000 ? `+` : "";
 
@@ -188,6 +224,24 @@ export function ChatHeader({
           >
             <PlusCircle size={16} />
             <span>New Chat</span>
+          </Button>
+          <Button
+            onClick={handleOpenAppConfigChat}
+            variant="ghost"
+            className="hidden @2xs:flex items-center justify-start gap-2 mx-2 py-3"
+            title="Open per-app configuration chat"
+          >
+            <Info size={16} />
+            <span>App Config Chat</span>
+          </Button>
+          <Button
+            onClick={handleOpenMobileConfigChat}
+            variant="ghost"
+            className="hidden @2xs:flex items-center justify-start gap-2 mx-2 py-3"
+            title="Open per-app mobile configuration chat"
+          >
+            <Info size={16} />
+            <span>Mobile Config Chat</span>
           </Button>
           <Button
             onClick={onVersionClick}

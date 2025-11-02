@@ -6,8 +6,10 @@ import {
   Cog,
   Boxes,
   FolderOpen,
+  User,
 } from "lucide-react";
 import { useActiveAccount } from "@/hooks/useActiveAccount";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
 // Floating navigation bar centered near the bottom.
 // Glassmorphism style, rounded, separated buttons.
@@ -15,6 +17,7 @@ export function FloatingNav() {
   const routerState = useRouterState();
   const pathname = routerState.location.pathname;
   const { activeAccount } = useActiveAccount();
+  const { user } = useSupabaseAuth();
   const [overlayOpen, setOverlayOpen] = useState(false);
 
   const items = [
@@ -23,14 +26,27 @@ export function FloatingNav() {
     { title: "Library", to: "/library", icon: FolderOpen },
     { title: "Hub", to: "/hub", icon: Boxes },
     { title: "Settings", to: "/settings", icon: Cog },
-    { title: "Account", to: "/account", icon: Cog }, // fallback if user avatar not available
+    { title: "Account", to: "/account", icon: User }, // use User icon to avoid confusion with Settings
   ];
 
   const isActive = (to: string) =>
     (to === "/" && pathname === "/") || (to !== "/" && pathname.startsWith(to));
 
-  const avatarUrl = activeAccount?.avatarUrl || "";
-  const avatarLabel = (activeAccount?.name || activeAccount?.email || "").slice(0, 1).toUpperCase();
+  // Prefer active account avatar; fallback to Supabase avatar
+  const avatarUrl =
+    activeAccount?.avatarUrl || (user as any)?.user_metadata?.avatar_url || "";
+  // Prefer active account display name/email; fallback to Supabase user metadata or email
+  const supabaseDisplayName = (
+    (user?.user_metadata?.full_name ||
+      user?.user_metadata?.name ||
+      user?.user_metadata?.username ||
+      user?.email ||
+      "") as string
+  ).trim();
+  const nameOrEmail = (
+    activeAccount?.name || activeAccount?.email || supabaseDisplayName
+  )?.trim();
+  const avatarLabel = (nameOrEmail || "U").slice(0, 1).toUpperCase();
 
   return (
     <div className="pointer-events-none fixed bottom-8 left-0 right-0 flex justify-center z-50">
@@ -56,12 +72,12 @@ export function FloatingNav() {
 
         {/* Center avatar button */}
         <button
-          aria-label="User"
+          aria-label={nameOrEmail || "Account"}
           className="h-14 w-14 rounded-full border border-(--border) bg-(--background) hover:bg-(--background-lightest) overflow-hidden shadow-md"
           onClick={() => setOverlayOpen((v) => !v)}
         >
           {avatarUrl ? (
-            <img src={avatarUrl} alt="User" className="h-full w-full object-cover" />
+            <img src={avatarUrl} alt={nameOrEmail || "Account"} className="h-full w-full object-cover" />
           ) : (
             <div className="h-full w-full flex items-center justify-center text-sm text-muted-foreground">
               {avatarLabel || "U"}
@@ -92,7 +108,7 @@ export function FloatingNav() {
             <div className="flex items-center gap-3 mb-3">
               <div className="h-10 w-10 rounded-full overflow-hidden border border-(--border)">
                 {avatarUrl ? (
-                  <img src={avatarUrl} alt="User" className="h-full w-full object-cover" />
+                  <img src={avatarUrl} alt={nameOrEmail || "Account"} className="h-full w-full object-cover" />
                 ) : (
                   <div className="h-full w-full flex items-center justify-center text-sm text-muted-foreground">
                     {avatarLabel || "U"}
@@ -100,14 +116,14 @@ export function FloatingNav() {
                 )}
               </div>
               <div className="text-sm">
-                <div className="font-medium">{activeAccount?.name || activeAccount?.email || "Usuário"}</div>
+                <div className="font-medium">{activeAccount?.name || activeAccount?.email || "Account"}</div>
                 {activeAccount?.provider ? (
                   <div className="text-muted-foreground">{activeAccount.provider}</div>
                 ) : null}
               </div>
             </div>
             <div className="space-y-2">
-              <OverlayLink to="/settings">Configurações</OverlayLink>
+              {/* Remove duplicate Settings link to avoid confusion with main Settings button */}
               <OverlayLink to="/account">Conta</OverlayLink>
               <OverlayLink to="/library">Biblioteca</OverlayLink>
               <OverlayLink to="/hub">Hub</OverlayLink>

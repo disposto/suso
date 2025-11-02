@@ -54,7 +54,7 @@ export const MessagesList = forwardRef<HTMLDivElement, MessagesListProps>(
 
     return (
       <div
-        className="h-full w-full overflow-y-auto p-4"
+        className="h-full w-full overflow-hidden p-4"
         ref={ref}
         data-testid="messages-list"
       >

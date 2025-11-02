@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { IpcClient } from "@/ipc/ipc_client";
 import { useSettings } from "@/hooks/useSettings";
@@ -23,6 +23,20 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
 }) => {
   const { settings, updateSettings } = useSettings();
   const [showConsentDialog, setShowConsentDialog] = useState(false);
+
+  const creator = useMemo(() => {
+    // Try to parse "org" from githubUrl or id
+    const url = template.githubUrl || "";
+    let org: string | null = null;
+    const match = url.match(/github\.com\/(.*?)\//);
+    if (match && match[1]) org = match[1];
+    if (!org && typeof template.id === "string" && template.id.includes("/")) {
+      org = template.id.split("/")[0];
+    }
+    const name = org || "Community";
+    const avatarUrl = org ? `https://github.com/${org}.png?size=40` : undefined;
+    return { name, avatarUrl };
+  }, [template.githubUrl, template.id]);
 
   const handleCardClick = () => {
     // If it's a community template and user hasn't accepted community code yet, show dialog
@@ -119,6 +133,19 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
                 Experimental
               </span>
             )}
+          </div>
+          {/* Creator info */}
+          <div className="flex items-center gap-2 mb-2 text-sm text-muted-foreground">
+            {creator.avatarUrl ? (
+              <img
+                src={creator.avatarUrl}
+                alt={creator.name}
+                className="h-5 w-5 rounded-full border border-(--border)"
+              />
+            ) : (
+              <div className="h-5 w-5 rounded-full bg-muted" />
+            )}
+            <span className="truncate">{creator.name}</span>
           </div>
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-3 h-10 overflow-y-auto">
             {template.description}

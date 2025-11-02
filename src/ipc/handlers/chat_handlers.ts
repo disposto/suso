@@ -60,6 +60,118 @@ export function registerChatHandlers() {
     return chat.id;
   });
 
+  // Create or retrieve the app-config chat for an app
+  handle("create-app-config-chat", async (_, appId: number): Promise<number> => {
+    // Validate app exists
+    const app = await db.query.apps.findFirst({
+      where: eq(apps.id, appId),
+      columns: { id: true, path: true },
+    });
+    if (!app) {
+      throw new Error("App not found");
+    }
+
+    // If an app-config chat already exists, return it
+    const existing = await db.query.chats.findFirst({
+      where: and(eq(chats.appId, appId), eq(chats.title, "App Config")),
+      columns: { id: true },
+    });
+    if (existing) {
+      logger.info("Found existing app-config chat:", existing.id, "for app:", appId);
+      return existing.id;
+    }
+
+    let initialCommitHash = null;
+    try {
+      initialCommitHash = await git.resolveRef({
+        fs,
+        dir: getDyadAppPath(app.path),
+        ref: "main",
+      });
+    } catch (error) {
+      logger.error("Error getting git revision:", error);
+    }
+
+    // Create a new app-config chat
+    const [chat] = await db
+      .insert(chats)
+      .values({
+        appId,
+        title: "App Config",
+        initialCommitHash,
+      })
+      .returning();
+    logger.info(
+      "Created app-config chat:",
+      chat.id,
+      "for app:",
+      appId,
+      "with initial commit hash:",
+      initialCommitHash,
+    );
+    return chat.id;
+  });
+
+  // Create or retrieve the mobile-config chat for an app
+  handle(
+    "create-mobile-config-chat",
+    async (_, appId: number): Promise<number> => {
+      // Validate app exists
+      const app = await db.query.apps.findFirst({
+        where: eq(apps.id, appId),
+        columns: { id: true, path: true },
+      });
+      if (!app) {
+        throw new Error("App not found");
+      }
+
+      // If a mobile-config chat already exists, return it
+      const existing = await db.query.chats.findFirst({
+        where: and(eq(chats.appId, appId), eq(chats.title, "Mobile Config")),
+        columns: { id: true },
+      });
+      if (existing) {
+        logger.info(
+          "Found existing mobile-config chat:",
+          existing.id,
+          "for app:",
+          appId,
+        );
+        return existing.id;
+      }
+
+      let initialCommitHash = null;
+      try {
+        initialCommitHash = await git.resolveRef({
+          fs,
+          dir: getDyadAppPath(app.path),
+          ref: "main",
+        });
+      } catch (error) {
+        logger.error("Error getting git revision:", error);
+      }
+
+      // Create a new mobile-config chat
+      const [chat] = await db
+        .insert(chats)
+        .values({
+          appId,
+          title: "Mobile Config",
+          initialCommitHash,
+        })
+        .returning();
+      logger.info(
+        "Created mobile-config chat:",
+        chat.id,
+        "for app:",
+        appId,
+        "with initial commit hash:",
+        initialCommitHash,
+      );
+      return chat.id;
+    },
+  );
+
   ipcMain.handle("get-chat", async (_, chatId: number) => {
     const chat = await db.query.chats.findFirst({
       where: eq(chats.id, chatId),

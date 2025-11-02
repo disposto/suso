@@ -51,6 +51,8 @@ export const chats = pgTable("chats", {
     .notNull()
     .references(() => apps.id, { onDelete: "cascade" }),
   title: text("title"),
+  // Distinguish different types of chats, e.g., general vs app-config vs mobile-config
+  purpose: text("purpose").notNull().default("general"),
   initialCommitHash: text("initial_commit_hash"),
   createdAt: timestamp("created_at", { mode: "date" })
     .notNull()

@@ -18,6 +18,27 @@ export function useSupabaseAuth() {
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session ?? null);
       setUser(data.session?.user ?? null);
+      // Ensure local account row exists and is active for email/password users
+      if (isElectron() && data.session?.user?.email) {
+        const u = data.session.user;
+        const metaName = (u.user_metadata?.full_name || u.user_metadata?.name || u.user_metadata?.username || "").toString();
+        IpcClient.getInstance()
+          .upsertAccount({
+            provider: "supabase",
+            email: u.email,
+            name: metaName || null,
+            isActive: true,
+          })
+          .then(async () => {
+            // Guarantee it's the single active account
+            const rows = await IpcClient.getInstance().listAccounts();
+            const match = rows.find((r) => r.provider === "supabase" && r.email === u.email);
+            if (match?.id) {
+              await IpcClient.getInstance().setActiveAccount({ id: match.id });
+            }
+          })
+          .catch(() => {});
+      }
     });
 
     // Subscribe to auth changes
@@ -25,6 +46,26 @@ export function useSupabaseAuth() {
       (_event, newSession) => {
         setSession(newSession ?? null);
         setUser(newSession?.user ?? null);
+        // Keep local account in sync when session changes (Electron only)
+        if (isElectron() && newSession?.user?.email) {
+          const u = newSession.user;
+          const metaName = (u.user_metadata?.full_name || u.user_metadata?.name || u.user_metadata?.username || "").toString();
+          IpcClient.getInstance()
+            .upsertAccount({
+              provider: "supabase",
+              email: u.email,
+              name: metaName || null,
+              isActive: true,
+            })
+            .then(async () => {
+              const rows = await IpcClient.getInstance().listAccounts();
+              const match = rows.find((r) => r.provider === "supabase" && r.email === u.email);
+              if (match?.id) {
+                await IpcClient.getInstance().setActiveAccount({ id: match.id });
+              }
+            })
+            .catch(() => {});
+        }
       },
     );
 

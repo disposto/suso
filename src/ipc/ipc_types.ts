@@ -29,6 +29,10 @@ export interface ChatStreamParams {
     data: string; // Base64 encoded file data
     attachmentType: "upload-to-codebase" | "chat-context"; // FileAttachment type
   }>;
+  // When using Mobile mode, the renderer must validate and decrement a credit
+  // before starting a stream and set this flag to true. The main process will
+  // enforce that this flag is present for Mobile mode requests.
+  mobileCreditConsumed?: boolean;
   selectedComponent: ComponentSelection | null;
 }
 
@@ -74,6 +78,7 @@ export interface Message {
 export interface Chat {
   id: number;
   title: string;
+  purpose?: string; // e.g., 'general', 'app-config', 'mobile-config'
   messages: Message[];
   initialCommitHash?: string | null;
   dbTimestamp?: string | null;

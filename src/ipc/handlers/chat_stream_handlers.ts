@@ -272,6 +272,25 @@ export function registerChatStreamHandlers() {
         attachmentInfo = "\n\nAttachments:\n";
 
         for (const [index, attachment] of req.attachments.entries()) {
+          // Security: Validate file size (max 5MB) and image formats (PNG/JPEG only)
+          const base64Data = attachment.data.split(";base64,").pop() || "";
+          const fileBuffer = Buffer.from(base64Data, "base64");
+          const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
+          if (fileBuffer.length > MAX_FILE_SIZE_BYTES) {
+            throw new Error(
+              `Attachment '${attachment.name}' exceeds maximum size of 5MB`,
+            );
+          }
+          if (
+            attachment.type.startsWith("image/") &&
+            attachment.type !== "image/png" &&
+            attachment.type !== "image/jpeg"
+          ) {
+            throw new Error(
+              `Unsupported image format for '${attachment.name}'. Only PNG and JPEG are allowed.`,
+            );
+          }
+
           // Generate a unique filename
           const hash = crypto
             .createHash("md5")
@@ -281,10 +300,8 @@ export function registerChatStreamHandlers() {
           const filename = `${hash}${fileExtension}`;
           const filePath = path.join(TEMP_DIR, filename);
 
-          // Extract the base64 data (remove the data:mime/type;base64, prefix)
-          const base64Data = attachment.data.split(";base64,").pop() || "";
-
-          await writeFile(filePath, Buffer.from(base64Data, "base64"));
+          // Write validated attachment to temp directory
+          await writeFile(filePath, fileBuffer);
           attachmentPaths.push(filePath);
 
           if (attachment.attachmentType === "upload-to-codebase") {
@@ -387,6 +404,14 @@ ${componentSnippet}
         })
         .returning();
       const settings = readSettings();
+      // Enforce Mobile mode credit validation in main process
+      if (settings.selectedChatMode === "mobile") {
+        if (!req.mobileCreditConsumed) {
+          throw new Error(
+            "Mobile mode requires a validated credit before streaming",
+          );
+        }
+      }
       // Only Dyad Pro requests have request ids.
       if (settings.enableDyadPro) {
         // Generate requestId early so it can be saved with the message

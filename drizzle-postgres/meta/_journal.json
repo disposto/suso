@@ -8,6 +8,20 @@
       "when": 1761231787676,
       "tag": "0000_blue_tomas",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1761920596809,
+      "tag": "0001_serious_hannibal_king",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1761920639260,
+      "tag": "0002_harsh_agent_zero",
+      "breakpoints": true
     }
   ]
 }

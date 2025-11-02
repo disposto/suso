@@ -10,7 +10,7 @@ import {
   Trash2,
   AlertTriangle,
   Wrench,
-  Globe,
+  Smartphone,
 } from "lucide-react";
 import { ChatActivityButton } from "@/components/chat/ChatActivity";
 import { motion } from "framer-motion";
@@ -33,6 +33,7 @@ import { showError, showSuccess } from "@/lib/toast";
 import { useMutation } from "@tanstack/react-query";
 import { useCheckProblems } from "@/hooks/useCheckProblems";
 import { isPreviewOpenAtom } from "@/atoms/viewAtoms";
+import { useClearSessionData } from "@/hooks/useClearSessionData";
 
 export type PreviewMode =
   | "preview"
@@ -84,22 +85,8 @@ export const ActionHeader = () => {
     restartApp({ removeNodeModules: true });
   }, [restartApp]);
 
-  const useClearSessionData = () => {
-    return useMutation({
-      mutationFn: () => {
-        const ipcClient = IpcClient.getInstance();
-        return ipcClient.clearSessionData();
-      },
-      onSuccess: async () => {
-        await refreshAppIframe();
-        showSuccess("Preview data cleared");
-      },
-      onError: (error) => {
-        showError(`Error clearing preview data: ${error}`);
-      },
-    });
-  };
-
+  // Use a dedicated hook defined outside this component to avoid any
+  // possibility of conditional hook invocation across renders.
   const { mutate: clearSessionData } = useClearSessionData();
 
   const onClearSessionData = useCallback(() => {
@@ -253,8 +240,8 @@ export const ActionHeader = () => {
           {renderButton(
             "publish",
             publishRef,
-            <Globe size={14} />,
-            "Publish",
+            <Smartphone size={14} />,
+            "Mobile",
             "publish-mode-button",
           )}
         </div>

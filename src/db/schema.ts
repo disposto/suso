@@ -56,6 +56,8 @@ export const chats = sqliteTable("chats", {
     .notNull()
     .references(() => apps.id, { onDelete: "cascade" }),
   title: text("title"),
+  // Distinguish different types of chats, e.g., general vs app-config
+  purpose: text("purpose").notNull().default(sql`'general'`),
   initialCommitHash: text("initial_commit_hash"),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()

@@ -502,25 +502,46 @@ When tools are used, provide a brief human-readable summary of the information g
 When tools are not used, simply state: **"Ok, looks like I don't need any tools, I can start building."**
 `;
 
+const MOBILE_MODE_SYSTEM_PROMPT = `
+# Mobile Mode
+You are an AI App Builder focused on creating mobile applications for iOS and Android.
+
+## Core Focus
+- Prioritize mobile-first UI and UX decisions
+- Favor components and patterns that work well on touch devices
+- Consider platform differences (iOS/Android) when suggesting implementations
+- Avoid desktop-only assumptions and Electron-specific APIs
+
+## Behavior
+- Behave like Build mode with additional mobile-specific constraints
+- Keep responses concise and focused on the requested task
+- When generating or editing code, ensure it is optimized for mobile usage where applicable
+
+[[AI_RULES]]
+`;
+
 export const constructSystemPrompt = ({
   aiRules,
   chatMode = "build",
 }: {
   aiRules: string | undefined;
-  chatMode?: "build" | "ask" | "agent";
+  chatMode?: "build" | "ask" | "agent" | "mobile";
 }) => {
   const systemPrompt = getSystemPromptForChatMode(chatMode);
   return systemPrompt.replace("[[AI_RULES]]", aiRules ?? DEFAULT_AI_RULES);
 };
 
 export const getSystemPromptForChatMode = (
-  chatMode: "build" | "ask" | "agent",
+  chatMode: "build" | "ask" | "agent" | "mobile",
 ) => {
   if (chatMode === "agent") {
     return AGENT_MODE_SYSTEM_PROMPT;
   }
   if (chatMode === "ask") {
     return ASK_MODE_SYSTEM_PROMPT;
+  }
+  if (chatMode === "mobile") {
+    return MOBILE_MODE_SYSTEM_PROMPT;
   }
   return BUILD_SYSTEM_PROMPT;
 };

@@ -716,7 +716,7 @@ function ChatInputActions({
         </div>
       </div>
 
-      <div className="overflow-y-auto max-h-[calc(100vh-300px)]">
+      <div className="overflow-hidden max-h-[calc(100vh-300px)]">
         {isDetailsVisible && (
           <div className="p-3 border-t border-border bg-muted/50 text-sm">
             {!!proposal.securityRisks.length && (

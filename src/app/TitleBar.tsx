@@ -9,7 +9,7 @@ import logo from "../../assets/Nobre logo.png";
 import { providerSettingsRoute } from "@/routes/settings/providers/$provider";
 import { cn } from "@/lib/utils";
 import { useDeepLink } from "@/contexts/DeepLinkContext";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { DyadProSuccessDialog } from "@/components/DyadProSuccessDialog";
 import { useTheme } from "@/contexts/ThemeContext";
 import { IpcClient } from "@/ipc/ipc_client";
@@ -21,6 +21,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { ActionHeader } from "@/components/preview_panel/ActionHeader";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import { useActiveAccount } from "@/hooks/useActiveAccount";
+import { MobileCreditStatus } from "@/components/MobileCreditStatus";
 
 export const TitleBar = () => {
   // Detect if running inside Electron (preload exposes window.electron.ipcRenderer)
@@ -32,6 +35,20 @@ export const TitleBar = () => {
   const { settings, refreshSettings } = useSettings();
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
   const [showWindowControls, setShowWindowControls] = useState(false);
+  const { user } = useSupabaseAuth();
+  const { activeAccount } = useActiveAccount();
+  // Avatar/initial for top bar (replace previous "User's Workspace" label)
+  // Prefer the active account values; if absent, fall back to Supabase user metadata or email
+  const supabaseDisplayName = (
+    (user?.user_metadata?.full_name ||
+      user?.user_metadata?.name ||
+      user?.user_metadata?.username ||
+      user?.email ||
+      "") as string
+  ).trim();
+  const avatarUrl = activeAccount?.avatarUrl || (user as any)?.user_metadata?.avatar_url || "";
+  const nameOrEmail = (activeAccount?.name || activeAccount?.email || supabaseDisplayName).trim();
+  const avatarLabel = (nameOrEmail || "U").slice(0, 1).toUpperCase();
 
   useEffect(() => {
     // Check if we're running on Windows
@@ -90,6 +107,16 @@ export const TitleBar = () => {
         <div className={`${showWindowControls ? "pl-2" : "pl-18"}`}></div>
 
         <img src={logo} alt="Suso Logo" className="w-5 h-5 mr-1" />
+        {/* Centered, prominent avatar/initial */}
+        <div className="absolute left-1/2 -translate-x-1/2 pointer-events-none">
+          <div className="h-10 w-10 rounded-full border border-(--border) bg-(--background) overflow-hidden flex items-center justify-center shadow-sm">
+            {avatarUrl ? (
+              <img src={avatarUrl} alt={nameOrEmail || "Account"} className="h-full w-full object-cover" />
+            ) : (
+              <span className="text-lg font-bold text-muted-foreground leading-none">{avatarLabel}</span>
+            )}
+          </div>
+        </div>
         <Button
           data-testid="title-bar-app-name-button"
           variant="outline"
@@ -229,6 +256,7 @@ export function DyadProButton({
       {userBudget && isDyadProEnabled && (
         <AICreditStatus userBudget={userBudget} />
       )}
+      <MobileCreditStatus />
     </Button>
   );
 }

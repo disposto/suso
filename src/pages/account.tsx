@@ -53,11 +53,11 @@ export default function AccountPage() {
               return (
                 <div key={acc.id} className="flex items-center justify-between border rounded-md p-3">
                   <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                    <div className="h-9 w-9 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden flex items-center justify-center">
                       {acc.avatarUrl ? (
                         <img src={acc.avatarUrl} alt={acc.name || acc.email || acc.provider} className="h-full w-full object-cover" />
                       ) : (
-                        <div className="h-full w-full flex items-center justify-center text-xs text-gray-500">{(acc.name || acc.email || acc.provider || "").slice(0, 1).toUpperCase()}</div>
+                        <span className="text-xs font-semibold text-gray-600 dark:text-gray-300 leading-none">{(acc.name || acc.email || acc.provider || "").slice(0, 1).toUpperCase()}</span>
                       )}
                     </div>
                     <div>
@@ -96,7 +96,6 @@ export default function AccountPage() {
               <Label htmlFor="provider">Provider</Label>
               <Input
                 id="provider"
-                placeholder="e.g. github, vercel"
                 value={form.provider || ""}
                 onChange={(e) => setForm((f) => ({ ...f, provider: e.target.value }))}
               />
@@ -125,14 +124,6 @@ export default function AccountPage() {
                 id="avatar"
                 value={form.avatarUrl || ""}
                 onChange={(e) => setForm((f) => ({ ...f, avatarUrl: e.target.value }))}
-              />
-            </div>
-            <div className="grid grid-cols-1 gap-2">
-              <Label htmlFor="externalId">External ID</Label>
-              <Input
-                id="externalId"
-                value={form.externalId || ""}
-                onChange={(e) => setForm((f) => ({ ...f, externalId: e.target.value }))}
               />
             </div>
 

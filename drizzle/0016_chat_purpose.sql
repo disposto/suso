@@ -1,0 +1,1 @@
+ALTER TABLE `chats` ADD `purpose` text DEFAULT 'general' NOT NULL;

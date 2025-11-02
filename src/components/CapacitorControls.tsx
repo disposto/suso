@@ -30,6 +30,7 @@ interface CapacitorControlsProps {
 }
 
 type CapacitorStatus = "idle" | "syncing" | "opening";
+type ApkStatus = "idle" | "syncing" | "building";
 
 export function CapacitorControls({ appId }: CapacitorControlsProps) {
   const queryClient = useQueryClient();
@@ -40,6 +41,7 @@ export function CapacitorControls({ appId }: CapacitorControlsProps) {
   } | null>(null);
   const [iosStatus, setIosStatus] = useState<CapacitorStatus>("idle");
   const [androidStatus, setAndroidStatus] = useState<CapacitorStatus>("idle");
+  const [apkStatus, setApkStatus] = useState<ApkStatus>("idle");
 
   // Check if Capacitor is installed
   const { data: isCapacitor, isLoading } = useQuery({
@@ -136,6 +138,17 @@ export function CapacitorControls({ appId }: CapacitorControlsProps) {
     }
   };
 
+  const getBuildApkButtonText = () => {
+    switch (apkStatus) {
+      case "syncing":
+        return { main: "Syncing...", sub: "Preparing Android project" };
+      case "building":
+        return { main: "Building APK...", sub: "Gradle assembleDebug" };
+      default:
+        return { main: "Build APK (Debug)", sub: "Generate app-debug.apk" };
+    }
+  };
+
   // Don't render anything while loading
   if (isLoading) {
     return null;
@@ -143,6 +156,38 @@ export function CapacitorControls({ appId }: CapacitorControlsProps) {
 
   const iosButtonText = getIosButtonText();
   const androidButtonText = getAndroidButtonText();
+  const buildApkButtonText = getBuildApkButtonText();
+
+  // Build APK mutation
+  const buildApkMutation = useMutation({
+    mutationFn: async () => {
+      setApkStatus("syncing");
+      // If Capacitor is not installed, perform the upgrade automatically
+      if (!isCapacitor) {
+        await IpcClient.getInstance().executeAppUpgrade({ appId, upgradeId: "capacitor" });
+        await queryClient.invalidateQueries({ queryKey: ["is-capacitor", appId] });
+      }
+      // Sync project before build
+      await IpcClient.getInstance().syncCapacitor({ appId });
+      setApkStatus("building");
+      const apkPath = await IpcClient.getInstance().buildApk({ appId });
+      return apkPath;
+    },
+    onSuccess: async (apkPath: string) => {
+      setApkStatus("idle");
+      showSuccess(`APK built successfully: ${apkPath}`);
+      try {
+        await IpcClient.getInstance().showItemInFolder(apkPath);
+      } catch (err) {
+        // Non-fatal if showItemInFolder fails; keep quiet
+        console.debug("Failed to show APK in folder:", err);
+      }
+    },
+    onError: (error) => {
+      setApkStatus("idle");
+      showErrorDialog("Failed to build APK", error);
+    },
+  });
 
   return (
     <>
@@ -222,6 +267,23 @@ export function CapacitorControls({ appId }: CapacitorControlsProps) {
                 <div className="text-xs text-gray-500">
                   {androidButtonText.sub}
                 </div>
+              </div>
+            </Button>
+            <Button
+              onClick={() => buildApkMutation.mutate()}
+              disabled={buildApkMutation.isPending}
+              variant="outline"
+              size="sm"
+              className="col-span-2 flex items-center gap-2 h-10"
+            >
+              {buildApkMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <TabletSmartphone className="h-4 w-4" />
+              )}
+              <div className="text-left">
+                <div className="text-xs font-medium">{buildApkButtonText.main}</div>
+                <div className="text-xs text-gray-500">{buildApkButtonText.sub}</div>
               </div>
             </Button>
           </div>

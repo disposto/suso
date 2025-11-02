@@ -136,4 +136,83 @@ export function registerCapacitorHandlers() {
       });
     },
   );
+
+  // Build a debug APK for Android via Gradle
+  handle(
+    "build-apk",
+    async (
+      _,
+      { appId }: { appId: number },
+    ): Promise<string> => {
+      const app = await getApp(appId);
+      const appPath = getDyadAppPath(app.path);
+
+      if (!isCapacitorInstalled(appPath)) {
+        throw new Error("Capacitor is not installed in this app");
+      }
+
+      if (IS_TEST_BUILD) {
+        // Simulate APK build success in tests
+        const simulatedApk = path.join(
+          appPath,
+          "android",
+          "app",
+          "build",
+          "outputs",
+          "apk",
+          "debug",
+          "app-debug.apk",
+        );
+        logger.info("Test mode: Simulating APK build at", simulatedApk);
+        return simulatedApk;
+      }
+
+      // Ensure web assets are built and Capacitor is in sync with Android
+      await simpleSpawn({
+        command: "npm run build",
+        cwd: appPath,
+        successMessage: "App built successfully",
+        errorPrefix: "Failed to build app",
+      });
+
+      await simpleSpawn({
+        command: "npx cap sync android",
+        cwd: appPath,
+        successMessage: "Capacitor Android sync completed successfully",
+        errorPrefix: "Failed to sync Capacitor for Android",
+        env: { ...process.env, LANG: "en_US.UTF-8" },
+      });
+
+      // Now invoke Gradle to assemble a debug APK
+      const androidDir = path.join(appPath, "android");
+      const isWindows = process.platform === "win32";
+      const gradleCmd = isWindows ? "gradlew.bat assembleDebug" : "./gradlew assembleDebug";
+
+      await simpleSpawn({
+        command: gradleCmd,
+        cwd: androidDir,
+        successMessage: "Gradle build (assembleDebug) completed successfully",
+        errorPrefix: "Failed to run Gradle build",
+      });
+
+      const apkPath = path.join(
+        androidDir,
+        "app",
+        "build",
+        "outputs",
+        "apk",
+        "debug",
+        "app-debug.apk",
+      );
+
+      if (!fs.existsSync(apkPath)) {
+        throw new Error(
+          `APK build completed but output file not found at: ${apkPath}. Please open Android Studio to review build settings.`,
+        );
+      }
+
+      logger.info("APK built at:", apkPath);
+      return apkPath;
+    },
+  );
 }
